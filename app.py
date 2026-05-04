@@ -107,13 +107,12 @@ def get_rek(era, acc, mood, df_c, n=5):
     return rek.sort_values(["skor","avg_rating"], ascending=[False,False]).head(n)
 
 
-# Page setup 
-
+# Page setup, mengatur tampilan dasar web
 st.set_page_config(page_title="Projek ML Musik", page_icon="🎵", layout="wide")
 if "page" not in st.session_state:
     st.session_state.page = "intro"
 
-# Navbar atas
+# Navbar atas (cuma dekor biar keren)
 st.markdown("""
 <div style="display:flex;align-items:center;justify-content:space-between;
      padding:1.2rem 0;border-bottom:1px solid #1a1a1a;margin-bottom:2rem;">
@@ -137,6 +136,7 @@ st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
 
 
 # HALAMAN 1: INTRO
+#introduction
 if st.session_state.page == "intro":
     st.markdown("""
     <div style="text-align:center;padding:4rem 0 2rem;">
@@ -175,9 +175,11 @@ elif st.session_state.page == "dataset":
     m3.metric("Avg Rating",        f"{df['avg_rating'].mean():.2f}")
     m4.metric("Avg Aksesibilitas", f"{df['accessibility'].mean():.1f}/10")
 
+    #deep dive
     st.markdown("<h2 style='font-family:DM Serif Display,serif;font-size:2.5rem;color:#f0ede8;margin:2.5rem 0 1.5rem;'>DEEP DIVE</h2>", unsafe_allow_html=True)
 
     # visualisasi data
+  #template chart
     def bar_dark(data, x, y, h=300):
         f = px.bar(data, x=x, y=y, orientation="h", template="plotly_dark",
                    color=x, color_continuous_scale=["#1a1a1a", "#e8d5a3"])
@@ -194,8 +196,9 @@ elif st.session_state.page == "dataset":
 
     col_l, col_r = st.columns(2)
 
+  #total rating
     with col_l:
-        cap("TOP 10 ARTIS — RATING COUNT")
+        cap("TOP 10 ARTIS — TOTAL RATING")
         top_a = df.groupby("artist_name")["rating_count"].sum().nlargest(10).reset_index()
         st.plotly_chart(bar_dark(top_a, "rating_count", "artist_name"), use_container_width=True)
 
@@ -423,7 +426,7 @@ elif st.session_state.page == "about":
 # HALAMAN 5: KODE PROYEK
 elif st.session_state.page == "kode":
 
-    # Header halaman
+    # Header halaman kode proyek
     st.markdown("""
     <h1 style="font-family:'DM Serif Display',serif;font-size:3rem;font-weight:400;color:#f0ede8;margin-bottom:0.3rem;">Kode Proyek</h1>
     <p style="font-family:'DM Mono',monospace;font-size:0.65rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;">
@@ -434,6 +437,8 @@ elif st.session_state.page == "kode":
     # Render tiap cell notebook: markdown -> st.markdown, code -> st.code
 
     st.markdown('## 1. Import Library')
+
+  #import kode jupyter notebook supaya bisa dibaca di streamlit
     st.code("""# pandas, manipulasi data tabel
 import pandas as pd
 #operasi matematis
