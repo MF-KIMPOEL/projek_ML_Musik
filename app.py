@@ -409,7 +409,7 @@ elif st.session_state.page == "about":
         #font
         st.markdown("""
         <div style="background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1.5rem;">
-            <p style="font-family:'DM Mono',monospace;font-size:0.62rem;color:#444;letter-spacing:0.15em;margin:0 0 0.75rem;">TECH STACK</p>
+            <p style="font-family:'DM Mono',monospace;font-size:0.62rem;color:#444;letter-spacing:0.15em;margin:0 0 0.75rem;">ALAT YANG DIGUNAKAN</p>
             <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
                 <span style="font-family:'DM Mono',monospace;font-size:0.68rem;color:#e8d5a3;background:#1a1a1a;padding:0.25rem 0.6rem;border-radius:2px;border:1px solid #2a2a2a;">Python</span>
                 <span style="font-family:'DM Mono',monospace;font-size:0.68rem;color:#e8d5a3;background:#1a1a1a;padding:0.25rem 0.6rem;border-radius:2px;border:1px solid #2a2a2a;">Streamlit</span>
