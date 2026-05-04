@@ -700,23 +700,23 @@ def cari_album_di_dataset(input_list, dataset):
 ERA_KETERANGAN = {
     'Pionir': {
         'rentang'    : '~1920 - 1969',
-        'keterangan' : 'Era perintis musik rekaman modern. Musik zaman ini merupakan fondasi dari semua yang kita dengar sekarang. Ditandai oleh lahirnya rock n roll, soul klasik, jazz besar, folk awal, dan eksperimen psikedelik pertama. Tokoh seperti The Beatles, Bob Dylan, Jimi Hendrix, Miles Davis, dan Motown mendefinisikan apa artinya bermusik. Kamu punya selera klasik yang mendalam dan menghargai akar dari segala genre modern.'
+        'keterangan' : 'Orang tuwa. jaman jamannya bob dylan, black sabbath, fleetwood mac dll'
     },
     'Old School': {
         'rentang'    : '1970 - 1984',
-        'keterangan' : 'Era rock klasik, prog, punk, funk, soul, dan disco. Ini masa kejayaan album sebagai medium utama bermusik — orang beli vinyl dan dengar dari depan sampai belakang. Led Zeppelin, Pink Floyd, Black Sabbath, Fleetwood Mac, Stevie Wonder, The Clash mendominasi. Kamu menikmati musik yang terasa besar, epik, dan penuh craftsmanship.'
+        'keterangan' : 'era keemasan rock(mungkin). pink floyd, king crimson, yes'
     },
     'Mid High School': {
         'rentang'    : '1985 - 1999',
-        'keterangan' : 'Era alternatif, grunge, shoegaze, hip-hop golden age, britpop, dan elektronik awal. MTV mengubah cara orang mengonsumsi musik. Nirvana, Radiohead, Massive Attack, Nas, Bjork, My Bloody Valentine menjadi ikon. Musik terasa raw, penuh emosi, dan subversif. Kamu suka musik yang berkarakter kuat dan tidak mainstream.'
+        'keterangan' : 'eranya musik yang kasar seperti grunge. jamannya nirvana dll'
     },
     'New School': {
         'rentang'    : '2000 - 2012',
-        'keterangan' : 'Era indie boom, emo, post-rock, digital revolution, dan hip-hop modern. iTunes dan MySpace mengubah distribusi musik. Arcade Fire, Radiohead (lagi), Kanye West, LCD Soundsystem, Bon Iver, Sufjan Stevens mendefinisikan dekade ini. Kamu menikmati musik yang thoughtful, layered, dan seringkali punya narasi kuat.'
+        'keterangan' : 'masuk era modern dan digital, musik elektronik dan emo makin membabi buta. LCD soundsystem, my chemical romance, greenday dll.'
     },
     'New New School': {
         'rentang'    : '2013 - sekarang',
-        'keterangan' : 'Era streaming, SoundCloud rap, hyperpop, bedroom pop, dan genre-blending tanpa batas. Spotify dan Apple Music mendominasi konsumsi musik. Kendrick Lamar, Frank Ocean, Lorde, The Weeknd, Billie Eilish, Rosalia, dan ribuan artis DIY bermunculan. Kamu mengikuti perkembangan musik kontemporer dan tidak takut mengeksplorasi sound yang tidak konvensional.'
+        'keterangan' : 'Era streaming, era palng eksperimental, bervariasi dan tidak jelas. salah satu era favorit saya. kendrick lamar, laufey, deathgrips.'
     }
 }
 
