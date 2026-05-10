@@ -58,9 +58,9 @@ ERA_INFO = {
     "New New School":  {"emoji":"📱","rentang":"2013–kini", "warna":"#A050E0","desc":"Era streaming, eranya pendukung ******.","tokoh":"Kendrick Lamar · Frank Ocean · Laufey"},
 }
 ACC_INFO = {
-    "Niche":             {"emoji":"🔬","warna":"#3050A0","singkat":"ini guwa banget nih","desc":"diketahui sedikit orang."},
-    "Elitis":            {"emoji":"🎓","warna":"#6040B0","singkat":"jarang mandi","desc":"masuk ranah underground."},
-    "Tidak Basic":       {"emoji":"🎸","warna":"#208060","singkat":"nolep fungsional","desc":"masuk ranah anak band."},
+    "Niche":             {"emoji":"🔬","warna":"#3050A0","singkat":"ini guwa banget nih","desc":"sedikit yang tahu."},
+    "Elitis":            {"emoji":"🎓","warna":"#6040B0","singkat":"jarang mandi","desc":"underground."},
+    "Tidak Basic":       {"emoji":"🎸","warna":"#208060","singkat":"nolep fungsional","desc":"lumayanlah lumayan."},
     "Agak Lumayan Basic":{"emoji":"🎧","warna":"#808020","singkat":"yabolelah","desc":"terkenal tidak pakai illl."},
     "Basic":             {"emoji":"📻","warna":"#A04020","singkat":"oke","desc":"terkenale illl."},
 }
@@ -116,7 +116,7 @@ def get_acc(dfc):
     return Counter(p).most_common(1)[0][0]
 
 def get_mood(dfc):
-    # Ambil 3 mood/descriptor paling sering, kecuali kata teknis
+    # Ambil 3 mood descriptor yang paling sering muncul
     semua = [k.strip() for d in dfc["descriptors"].dropna() for k in d.split(",") if k.strip() not in EXCLUDE]
     return Counter(semua).most_common(3) if semua else [("tidak tersedia",0)]
 
@@ -165,10 +165,12 @@ if page == "Introduction":
 
     st.markdown("<div style='height:1.5rem'></div>", unsafe_allow_html=True)
 
-    # Distribusi era
+    # menghitung dan memproses data era
     label("DISTRIBUSI ERA DALAM DATASET")
+    #mengambil data era dan mengurutkannya dan menugbah nama kolom supaya lebih mudah dibaca
     ec = df["era"].value_counts().sort_index().reset_index()
     ec.columns = ["era","count"]
+#membuat chart bar
     fig = px.bar(ec, x="era", y="count", template="plotly_dark", color="era",
                  color_discrete_map={"Pionir":"#C0A060","Old School":"#E07040","Mid High School":"#5080D0","New School":"#40B080","New New School":"#A050E0"})
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
@@ -177,24 +179,25 @@ if page == "Introduction":
                       yaxis=dict(gridcolor="#1a1a1a",tickfont=dict(color="#444",size=9)))
     st.plotly_chart(fig, use_container_width=True)
 
-    # Cara kerja
+    # buat 3 kolom dengan for biar praktis
     label("CARA KERJA")
     for col, num, judul, isi in zip(st.columns(3),
         ["01","02","03"],
         ["INPUT","PREDIKSI ML","REKOMENDASI"],
-        ["Pilih album atau artis favoritmu dari dropdown.",
-         "Dua model mengklasifikasi era & aksesibilitas seleramu.",
-         "Album dengan era + mood paling mirip ditampilkan."]):
+        ["Pilih album atau artis yang tersedia.",
+         "Dua model memprediksi era dan mood njenengan.",
+         "Rekomendasi album berdasarkan era dan mood."]):
         col.markdown(f"<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1.3rem;'><p style='font-family:DM Mono,monospace;font-size:0.55rem;color:#2a2a2a;margin:0 0 0.4rem;'>{num}</p><p style=\"font-family:'DM Serif Display',serif;font-size:1rem;color:#e8d5a3;margin:0 0 0.4rem;\">{judul}</p><p style='font-size:0.8rem;color:#555;line-height:1.6;margin:0;'>{isi}</p></div>", unsafe_allow_html=True)
 
 
-# ══════════════════════════
+
 # HALAMAN 2 — DATASET
-# ══════════════════════════
+
 elif page == "Dataset":
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Dataset</h1>", unsafe_allow_html=True)
     st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>SOURCE · RATEYOURMUSIC — 5000+ ALBUM</p>", unsafe_allow_html=True)
 
+#membuat 4 kolom penjelasan singkat datadset
     m1,m2,m3,m4 = st.columns(4)
     m1.metric("Total Album",       f"{len(df):,}")
     m2.metric("Tahun",             f"{int(df['year'].min())}–{int(df['year'].max())}")
@@ -202,21 +205,25 @@ elif page == "Dataset":
     m4.metric("Avg Aksesibilitas", f"{df['accessibility'].mean():.1f}/10")
 
     st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
+    #kaya mini navbar
     tab1, tab2 = st.tabs(["📋  TABEL DATA", "📊  VISUALISASI"])
 
     with tab1:
-        # Filter dan tampilkan dataframe
+        # Filter dataset dengan pilihan multiselect
         f1,f2,f3 = st.columns([2,2,1])
         era_f = f1.multiselect("Filter Era", df["era"].cat.categories.tolist())
         acc_f = f2.multiselect("Filter Aksesibilitas", ACC_ORDER)
         n_r   = f3.number_input("Baris", 10, 500, 50, 10)
 
+#mengkopi dataset dan menampilkan
         df_show = df.copy()
         if era_f: df_show = df_show[df_show["era"].isin(era_f)]
         if acc_f: df_show = df_show[df_show["acc_label"].isin(acc_f)]
 
+
         label(f"{len(df_show):,} BARIS DITEMUKAN")
         st.dataframe(df_show[["release_name","artist_name","year","avg_rating","rating_count","accessibility","era","acc_label","primary_genres"]].head(n_r),
+           #meyesuaikan hasil filter, data mana saja yang mau diperlihatkan
             use_container_width=True, height=420,
             column_config={
                 "release_name": st.column_config.TextColumn("Album"),
@@ -227,12 +234,15 @@ elif page == "Dataset":
             })
 
     with tab2:
+        #visualisasi data menggunakan barchart dan scatter
         cl, cr = st.columns(2)
+        #bagian kiri
         with cl:
             label("TOP 10 ARTIS — TOTAL RATING")
+            #tambahkan total rating tiap artis dan buat 10 terbesar
             top_a = df.groupby("artist_name")["rating_count"].sum().nlargest(10).reset_index()
             st.plotly_chart(bar_dark(top_a,"rating_count","artist_name"), use_container_width=True)
-
+#scatter
             label("RATING COUNT VS AVG RATING")
             fig2 = px.scatter(df, x="log_rating_count", y="avg_rating", color="era", opacity=0.45,
                               template="plotly_dark", hover_data=["release_name","artist_name"],
@@ -244,6 +254,7 @@ elif page == "Dataset":
                                yaxis=dict(gridcolor="#1e1e1e",tickfont=dict(color="#555",size=9)))
             st.plotly_chart(fig2, use_container_width=True)
 
+#baguan kanan
         with cr:
             label("TOP GENRES")
             semua_genre = [x.strip() for g in df["primary_genres"].dropna() for x in g.split(",")]
@@ -261,34 +272,39 @@ elif page == "Dataset":
 # ══════════════════════════
 elif page == "Analisis":
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Analisis & Rekomendasi</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>PILIH ALBUM ATAU ARTIS — MODEL AKAN MENGANALISIS SELERAMU</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>PILIH ALBUM ATAU ARTIS DAN AKAN SAYA RAMAL</p>", unsafe_allow_html=True)
 
+#ambil semua data album dan artis tanpa duplikat dan data kososng
     ALL_ALBUMS  = sorted(df["release_name"].dropna().unique(), key=str.lower)
     ALL_ARTISTS = sorted(df["artist_name"].dropna().unique(), key=str.lower)
-
+#pilih
     c1,c2 = st.columns(2)
     sel_albums  = c1.multiselect("🎵 Album yang kamu suka",  ALL_ALBUMS,  placeholder="Ketik atau pilih...")
     sel_artists = c2.multiselect("🎤 Artis favorit kamu",    ALL_ARTISTS, placeholder="Ketik atau pilih...")
     n_rek = st.slider("Jumlah rekomendasi", 3, 10, 5)
-
+#button generate
     _, bc, _ = st.columns([2,1,2])
     run = bc.button("✦  Generate", type="primary", use_container_width=True)
 
+#logika buat generate menggunakan if else beranak
     if run:
         if not sel_albums and not sel_artists:
-            st.warning("Pilih minimal satu album atau artis dulu ya.")
+            st.warning("Pilih minial satu bang.")
         else:
+#jika data valid nanti dicari era favoritnya, top mood dll jika tidak error
             dfc = get_rows(sel_albums, sel_artists)
             if dfc.empty:
-                st.error("Yah, gaketemu di dataset.")
+                st.error("tidak berketemu.")
             else:
                 era_fav  = get_era(dfc)
                 acc_fav  = get_acc(dfc)
                 top_mood = get_mood(dfc)
+                #berikan rekomendasi berdasarkan data era_fav, top_mood dan acc_fav
                 df_rek   = get_rek(era_fav, acc_fav, top_mood, dfc, n=n_rek)
+                #ambil informasi tambahan
                 ei, ai   = ERA_INFO.get(era_fav,{}), ACC_INFO.get(acc_fav,{})
-
-                st.markdown(f"<p style='font-size:0.82rem;color:#555;font-style:italic;margin-top:1rem;'>Berdasarkan {len(dfc)} album — {ai.get('singkat','')}.</p>", unsafe_allow_html=True)
+#outputnya, jumlah album yang dipilih dan penjelasan aksesibilitas singkat
+                st.markdown(f"<p style='font-size:0.82rem;color:#555;font-style:italic;margin-top:1rem;'>Berdasarkan {len(dfc)} album rika {ai.get('singkat','')}.</p>", unsafe_allow_html=True)
 
                 t1,t2,t3 = st.tabs(["🔍  PREDIKSI","💿  REKOMENDASI","🗂  DATA KAMU"])
 
