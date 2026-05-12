@@ -135,14 +135,6 @@ def get_rek(era, acc, mood, dfc, n=5):
 
 # === SIDEBAR ===
 with st.sidebar:
-    st.markdown("""
-    <div style='padding:1.5rem 0 2rem;'>
-        <p style="font-family:'DM Serif Display',serif;font-size:2.2rem;color:#e8d5a3;margin:0;">REQ<sup style='font-size:0.4em;'>✦</sup></p>
-        <p style="font-family:'DM Mono',monospace;font-size:0.58rem;color:#333;letter-spacing:0.2em;margin:0.3rem 0 0;">MUSIC ML PROJECT</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    page = st.radio("NAVIGASI", ["Introduction","Dataset","Analisis","About Me","Kode Proyek"], label_visibility="visible")
 
     st.markdown("<div style='height:3rem'></div>", unsafe_allow_html=True)
     st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.55rem;color:#222;letter-spacing:0.12em;line-height:2;border-top:1px solid #1a1a1a;padding-top:1rem;'>DATA · RateYourMusic<br>MODEL · scikit-learn<br>UI · Streamlit</p>", unsafe_allow_html=True)
@@ -151,7 +143,11 @@ with st.sidebar:
 # ══════════════════════════
 # HALAMAN 1 — INTRODUCTION
 # ══════════════════════════
-if page == "Introduction":
+
+Introduction, Dataset, Analisis, About_Me, Kode_Proyek = st.tabs([
+"Introduction", "Dataset", "Analisis", "About Me", "Kode Proyek"
+])
+with Introduction:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:5rem;color:#f0ede8;letter-spacing:-0.03em;line-height:1;margin:0 0 0.5rem;\">REQ<sup style='font-size:0.28em;vertical-align:super;color:#e8d5a3;'>✦</sup></h1>", unsafe_allow_html=True)
     st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#444;letter-spacing:0.2em;margin:0 0 2rem;'>MUSIC MACHINE LEARNING · RECOMMENDATION SYSTEM</p>", unsafe_allow_html=True)
     st.markdown("<p style='font-size:0.92rem;color:#666;max-width:560px;line-height:1.9;margin-bottom:2rem;'>Masukkan album atau artis favoritmu — REQ akan memprediksi era musikmu, tingkat aksesibilitas selera, top mood, lalu kasih rekomendasi album yang cocok.</p>", unsafe_allow_html=True)
@@ -193,7 +189,7 @@ if page == "Introduction":
 
 # HALAMAN 2 — DATASET
 
-elif page == "Dataset":
+with Dataset:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Dataset</h1>", unsafe_allow_html=True)
     st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>SOURCE · RATEYOURMUSIC — 5000+ ALBUM</p>", unsafe_allow_html=True)
 
@@ -267,20 +263,19 @@ elif page == "Dataset":
             st.plotly_chart(bar_dark(top10,"avg_rating","release_name"), use_container_width=True)
 
 
-# ══════════════════════════
 # HALAMAN 3 — ANALISIS
-# ══════════════════════════
-elif page == "Analisis":
+
+with Analisis:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Analisis & Rekomendasi</h1>", unsafe_allow_html=True)
     st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>PILIH ALBUM ATAU ARTIS DAN AKAN SAYA RAMAL</p>", unsafe_allow_html=True)
 
 #ambil semua data album dan artis tanpa duplikat dan data kososng
     ALL_ALBUMS  = sorted(df["release_name"].dropna().unique(), key=str.lower)
     ALL_ARTISTS = sorted(df["artist_name"].dropna().unique(), key=str.lower)
-#pilih
+#pilih album dan artis
     c1,c2 = st.columns(2)
-    sel_albums  = c1.multiselect("🎵 Album yang kamu suka",  ALL_ALBUMS,  placeholder="Ketik atau pilih...")
-    sel_artists = c2.multiselect("🎤 Artis favorit kamu",    ALL_ARTISTS, placeholder="Ketik atau pilih...")
+    sel_albums  = c1.multiselect("🎵 Album yang disukai",  ALL_ALBUMS,  placeholder="Ketik atau pilih...")
+    sel_artists = c2.multiselect("🎤 Artis yang disukai",    ALL_ARTISTS, placeholder="Ketik atau pilih...")
     n_rek = st.slider("Jumlah rekomendasi", 3, 10, 5)
 #button generate
     _, bc, _ = st.columns([2,1,2])
@@ -371,7 +366,7 @@ elif page == "Analisis":
 # ══════════════════════════
 # HALAMAN 4 — ABOUT ME
 # ══════════════════════════
-elif page == "About Me":
+with About_Me:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:2rem;\">About Me</h1>", unsafe_allow_html=True)
 
     cf, ci = st.columns([1,2], gap="large")
@@ -398,7 +393,7 @@ elif page == "About Me":
 # ══════════════════════════
 # HALAMAN 5 — KODE PROYEK
 # ══════════════════════════
-elif page == "Kode Proyek":
+with Kode_Proyek:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Kode Proyek</h1>", unsafe_allow_html=True)
     st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>proyek_reyal.ipynb &mdash; ditampilkan cell per cell</p>", unsafe_allow_html=True)
 
