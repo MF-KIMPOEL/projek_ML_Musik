@@ -1,3 +1,6 @@
+import html
+import os
+import nbformat
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -13,17 +16,33 @@ st.set_page_config(page_title="REQ · Music ML", page_icon="🎵", layout="wide"
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400&display=swap');
-html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
-[data-testid="stSidebar"] { background:#0a0a0a !important; border-right:1px solid #1a1a1a !important; }
+html, body, [class*="css"]  { font-family:'DM Sans',sans-serif; font-size:16px; }
+[data-testid="stSidebar"]   { background:#0a0a0a !important; border-right:1px solid #1a1a1a !important; }
 [data-testid="stAppViewContainer"] { background:#080808; }
-[data-testid="stHeader"] { background:transparent; }
-[data-testid="stMetric"] { background:#0f0f0f; border:1px solid #1e1e1e; border-radius:4px; padding:1rem 1.2rem; }
-[data-testid="stMetricLabel"] { font-family:'DM Mono',monospace !important; font-size:0.6rem !important; letter-spacing:0.18em !important; color:#444 !important; }
-[data-testid="stMetricValue"] { font-family:'DM Serif Display',serif !important; color:#e8d5a3 !important; font-size:1.6rem !important; }
-.stButton>button[kind="primary"] { background:#e8d5a3 !important; color:#080808 !important; font-family:'DM Mono',monospace !important; font-size:0.7rem !important; border:none !important; border-radius:2px !important; }
-.stMultiSelect [data-baseweb="tag"] { background:#1e1e1e !important; border:1px solid #2a2a2a !important; font-family:'DM Mono',monospace !important; color:#e8d5a3 !important; }
-.stTabs [data-baseweb="tab"] { font-family:'DM Mono',monospace !important; font-size:0.65rem !important; color:#444 !important; }
-.stTabs [aria-selected="true"] { color:#e8d5a3 !important; border-bottom-color:#e8d5a3 !important; }
+[data-testid="stHeader"]    { background:transparent; }
+
+/* Konten tab — beri napas di atas */
+[data-testid="stTabsContent"] > div { padding-top:2rem !important; }
+
+/* Kartu metrik */
+[data-testid="stMetric"]    { background:#0f0f0f; border:1px solid #1e1e1e; border-radius:6px; padding:1.1rem 1.3rem; }
+[data-testid="stMetricLabel"] { font-family:'DM Mono',monospace !important; font-size:0.7rem !important; letter-spacing:0.18em !important; color:#444 !important; }
+[data-testid="stMetricValue"] { font-family:'DM Serif Display',serif !important; color:#e8d5a3 !important; font-size:1.9rem !important; }
+
+/* Tombol utama */
+.stButton>button[kind="primary"] { background:#e8d5a3 !important; color:#080808 !important; font-family:'DM Mono',monospace !important; font-size:0.8rem !important; letter-spacing:0.1em !important; border:none !important; border-radius:3px !important; padding:0.6rem 1.4rem !important; }
+
+/* Tag multiselect */
+.stMultiSelect [data-baseweb="tag"] { background:#181818 !important; border:1px solid #2a2a2a !important; font-family:'DM Mono',monospace !important; color:#e8d5a3 !important; border-radius:3px !important; }
+
+/* Tab navigasi */
+.stTabs [data-baseweb="tab-list"] { border-bottom:1px solid #1a1a1a !important; gap:0.2rem; }
+.stTabs [data-baseweb="tab"]       { font-family:'DM Mono',monospace !important; font-size:0.72rem !important; color:#3a3a3a !important; padding:0.6rem 1rem !important; letter-spacing:0.08em; }
+.stTabs [aria-selected="true"]     { color:#e8d5a3 !important; border-bottom-color:#e8d5a3 !important; }
+
+/* Input & slider */
+[data-testid="stSlider"] { padding:0.3rem 0 0.8rem; }
+p, li, .stMarkdown p { font-size:1rem !important; line-height:1.85; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -51,57 +70,61 @@ df = load_data()
 
 # === KONSTANTA ===
 ERA_INFO = {
-    "Pionir":          {"emoji":"🎷","rentang":"~1920–1969","warna":"#C0A060","desc":"Era orang merintis, tis tis.","tokoh":"The Beatles · Bob Dylan · Miles Davis"},
-    "Old School":      {"emoji":"🎸","rentang":"1970–1984", "warna":"#E07040","desc":"Era old skull, bapak ibu kamu lahiran sini.","tokoh":"Led Zeppelin · Pink Floyd · Stevie Wonder"},
-    "Mid High School": {"emoji":"📼","rentang":"1985–1999", "warna":"#5080D0","desc":"Era panik satanis massal, mengerikan.","tokoh":"Nirvana · Radiohead · Nas · Björk"},
-    "New School":      {"emoji":"💿","rentang":"2000–2012", "warna":"#40B080","desc":"Era digital awal, indie mulai booming.","tokoh":"My Chemical Romance · Kanye West · Sufjan Stevens"},
-    "New New School":  {"emoji":"📱","rentang":"2013–kini", "warna":"#A050E0","desc":"Era streaming, eranya pendukung ******.","tokoh":"Kendrick Lamar · Frank Ocean · Laufey"},
+    "Pionir":          {"emoji":"🎷","rentang":"~1920–1969","warna":"#C0A060","desc":"Era perintisan musik modern. Para legenda membangun fondasi dari nol.","tokoh":"The Beatles · Bob Dylan · Miles Davis"},
+    "Old School":      {"emoji":"🎸","rentang":"1970–1984", "warna":"#E07040","desc":"Era kejayaan rock, soul, dan funk. Ikonik dan tidak lekang waktu.","tokoh":"Led Zeppelin · Pink Floyd · Stevie Wonder"},
+    "Mid High School": {"emoji":"📼","rentang":"1985–1999", "warna":"#5080D0","desc":"Era alternatif dan grunge. Penuh eksperimen dan keberanian.","tokoh":"Nirvana · Radiohead · Nas · Björk"},
+    "New School":      {"emoji":"💿","rentang":"2000–2012", "warna":"#40B080","desc":"Era digital awal. Gerakan indie mulai bersinar luas.","tokoh":"My Chemical Romance · Kanye West · Sufjan Stevens"},
+    "New New School":  {"emoji":"📱","rentang":"2013–kini", "warna":"#A050E0","desc":"Era streaming. Musik semakin beragam dan mudah dijangkau.","tokoh":"Kendrick Lamar · Frank Ocean · Laufey"},
 }
 ACC_INFO = {
-    "Niche":             {"emoji":"🔬","warna":"#3050A0","singkat":"ini guwa banget nih","desc":"sedikit yang tahu."},
-    "Elitis":            {"emoji":"🎓","warna":"#6040B0","singkat":"jarang mandi","desc":"underground."},
-    "Tidak Basic":       {"emoji":"🎸","warna":"#208060","singkat":"nolep fungsional","desc":"lumayanlah lumayan."},
-    "Agak Lumayan Basic":{"emoji":"🎧","warna":"#808020","singkat":"yabolelah","desc":"terkenal tidak pakai illl."},
-    "Basic":             {"emoji":"📻","warna":"#A04020","singkat":"oke","desc":"terkenale illl."},
+    "Niche":             {"emoji":"🔬","warna":"#3050A0","singkat":"Sangat Niche","desc":"Selera Anda sangat spesifik dan jarang dikenal khalayak umum."},
+    "Elitis":            {"emoji":"🎓","warna":"#6040B0","singkat":"Elitis","desc":"Anda cenderung menyukai musik underground bermutu tinggi."},
+    "Tidak Basic":       {"emoji":"🎸","warna":"#208060","singkat":"Tidak Basic","desc":"Selera Anda berada di luar arus utama, namun masih terjangkau."},
+    "Agak Lumayan Basic":{"emoji":"🎧","warna":"#808020","singkat":"Cukup Populer","desc":"Anda menyukai musik yang cukup dikenal tanpa terlalu mainstream."},
+    "Basic":             {"emoji":"📻","warna":"#A04020","singkat":"Sangat Populer","desc":"Anda menyukai musik yang sangat populer dan dikenal luas."},
 }
 MOOD_DESC = {
-    "melancholic":"Sedih dan indah","atmospheric":"Bangun suasana dan ruang.",
-    "introspective":"Ngajak refleksi ke dalam diri.","anxious":"Nuansa gelisah dan tegang.",
-    "cold":"Dingin dan jauh, tapi nagih.","energetic":"Penuh energi.",
-    "dark":"Ada unsur kegelapan.","epic":"Skala besar dan megah.",
-    "psychedelic":"Ngebuka persepsi.","hypnotic":"Menghipnotis.",
-    "lonely":"Kurang kasih sayang.","romantic":"Cinta yang hangat.",
-    "mellow":"Santai dan enak didengerin.",
+    "melancholic":"Bernuansa sedih namun indah dan menyentuh.","atmospheric":"Membangun suasana dan ruang yang mendalam.",
+    "introspective":"Mengajak merefleksikan diri ke dalam.","anxious":"Bernuansa gelisah dan penuh ketegangan.",
+    "cold":"Terasa dingin dan berjarak, namun tetap menarik.","energetic":"Penuh semangat dan energi.",
+    "dark":"Mengandung unsur kegelapan yang intens.","epic":"Berskala besar dan terasa megah.",
+    "psychedelic":"Membuka persepsi dengan cara yang unik.","hypnotic":"Memiliki daya hipnotis yang kuat.",
+    "lonely":"Terasa sunyi dan penuh kerinduan.","romantic":"Menghadirkan kehangatan cinta.",
+    "mellow":"Santai dan nyaman untuk didengarkan.",
 }
 ACC_ORDER = ["Niche","Elitis","Tidak Basic","Agak Lumayan Basic","Basic"]
 EXCLUDE   = {"malevocals","femalevocals","conceptalbum","instrumental","mixedvocals"}
 
 
-# === FUNGSI HELPER ===
+# === FUNGSI HELPER UI ===
 def label(text):
-    # Label kecil gaya DM Mono
-    st.markdown(f"<p style='font-family:DM Mono,monospace;font-size:0.6rem;color:#555;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.4rem;'>{text}</p>", unsafe_allow_html=True)
+    # Label kecil gaya DM Mono — dipakai sebagai sub-judul bagian
+    st.markdown(f"<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#555;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;'>{text}</p>", unsafe_allow_html=True)
 
 def card(content, warna="#1e1e1e", border_left=None):
-    # Card gelap — border_left opsional untuk aksen warna
+    # Kartu gelap dengan aksen warna opsional di sisi kiri
     bl = f"border-left:3px solid {border_left};" if border_left else ""
     st.markdown(f"<div style='background:#0f0f0f;border:1px solid {warna}33;{bl}border-radius:4px;padding:1.3rem;'>{content}</div>", unsafe_allow_html=True)
 
 def bar_dark(data, x, y, h=280):
-    # Bar chart horizontal tema gelap
+    # Bagan batang horizontal dengan tema gelap
     fig = px.bar(data, x=x, y=y, orientation="h", template="plotly_dark",
                  color=x, color_continuous_scale=["#1a1a1a","#e8d5a3"])
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                       showlegend=False, coloraxis_showscale=False, height=h,
                       margin=dict(l=0,r=0,t=6,b=0),
-                      xaxis=dict(gridcolor="#1e1e1e", tickfont=dict(color="#555",size=9)),
+                      xaxis=dict(gridcolor="#1e1e1e", tickfont=dict(color="#555",size=10)),
                       yaxis=dict(tickfont=dict(color="#aaa",size=10), categoryorder="total ascending"))
     return fig
+
+def divider(title):
+    # Pemisah antar-segmen — garis tipis + judul bagian di bawahnya
+    st.markdown(f"<div style='margin:2.5rem 0 1.3rem;padding-top:1.8rem;border-top:1px solid #161616;'><p style='font-family:DM Mono,monospace;font-size:0.68rem;color:#444;letter-spacing:0.22em;text-transform:uppercase;margin:0;'>{title}</p></div>", unsafe_allow_html=True)
 
 
 # === FUNGSI ML ===
 def get_rows(albums, artists):
-    # Ambil baris dari dataset sesuai pilihan user
+    # Ambil baris dari dataset sesuai pilihan pengguna
     mask = df["release_name"].isin(albums) | df["artist_name"].isin(artists)
     return df[mask].drop_duplicates(subset=["release_name","artist_name"])
 
@@ -116,7 +139,7 @@ def get_acc(dfc):
     return Counter(p).most_common(1)[0][0]
 
 def get_mood(dfc):
-    # Ambil 3 mood descriptor yang paling sering muncul
+    # Ambil 3 mood descriptor yang paling sering muncul, abaikan kata teknis
     semua = [k.strip() for d in dfc["descriptors"].dropna() for k in d.split(",") if k.strip() not in EXCLUDE]
     return Counter(semua).most_common(3) if semua else [("tidak tersedia",0)]
 
@@ -127,7 +150,7 @@ def get_rek(era, acc, mood, dfc, n=5):
     acc_r = [ACC_ORDER[i] for i in {max(0,idx-1), idx, min(4,idx+1)}]
     kata  = {m[0] for m in mood}
     rek   = df[(df["era"]==era) & (df["acc_label"].isin(acc_r)) & (~df["release_name"].str.lower().isin(sudah))].copy()
-    if len(rek) < n:  # fallback kalau kurang
+    if len(rek) < n:  # fallback: longgarkan filter aksesibilitas
         rek = df[(df["era"]==era) & (~df["release_name"].str.lower().isin(sudah))].copy()
     rek["skor"] = rek["descriptors"].apply(lambda d: 0 if pd.isna(d) else len({k.strip() for k in d.split(",")} & kata))
     return rek.sort_values(["skor","avg_rating"], ascending=[False,False]).head(n)
@@ -135,38 +158,179 @@ def get_rek(era, acc, mood, dfc, n=5):
 
 # === SIDEBAR ===
 with st.sidebar:
+    # Judul dan branding aplikasi
+    st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:2.4rem;color:#f0ede8;letter-spacing:-0.03em;line-height:1;margin:1rem 0 0.2rem;\">REQ<sup style='font-size:0.3em;vertical-align:super;color:#e8d5a3;'>✦</sup></h1>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#333;letter-spacing:0.16em;margin:0 0 1.2rem;'>MUSIC MACHINE LEARNING</p>", unsafe_allow_html=True)
+    st.markdown("<hr style='border:0;border-top:1px solid #1a1a1a;margin:0 0 1.2rem;'>", unsafe_allow_html=True)
 
-    st.markdown("<div style='height:3rem'></div>", unsafe_allow_html=True)
+    # Daftar navigasi halaman
+    label("Navigasi")
+    for ikon, judul, ket in [
+        ("✦","Analisis & Prediksi","Masukkan album atau artis favorit Anda."),
+        ("◎","Pengantar","Gambaran umum cara kerja sistem."),
+        ("▤","Dataset","Jelajahi dataset RateYourMusic."),
+        ("◈","Tentang Saya","Profil pengembang aplikasi."),
+        ("⌥","Kode Proyek","Notebook pelatihan model secara lengkap."),
+    ]:
+        st.markdown(f"<div style='padding:0.6rem 0.8rem;margin-bottom:0.3rem;border-radius:3px;border:1px solid #161616;background:#0c0c0c;'><p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#e8d5a3;margin:0 0 0.15rem;'>{ikon} {judul}</p><p style='font-size:0.82rem;color:#444;margin:0;'>{ket}</p></div>", unsafe_allow_html=True)
+
+    st.markdown("<hr style='border:0;border-top:1px solid #1a1a1a;margin:1rem 0;'>", unsafe_allow_html=True)
+
+    # Statistik ringkas dataset
+    label("Statistik Dataset")
+    for nama, nilai in [("Total Album",f"{len(df):,}"),("Total Artis",f"{df['artist_name'].nunique():,}"),
+                        ("Rentang Tahun",f"{int(df['year'].min())}–{int(df['year'].max())}"),("Rata-rata Rating",f"{df['avg_rating'].mean():.2f}")]:
+        st.markdown(f"<div style='display:flex;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid #111;'><span style='font-size:0.82rem;color:#444;'>{nama}</span><span style='font-family:DM Mono,monospace;font-size:0.82rem;color:#e8d5a3;'>{nilai}</span></div>", unsafe_allow_html=True)
+
+    st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
+
+    # Informasi akurasi model
+    label("Akurasi Model")
+    for nm, val in [("Model Era — Random Forest","94.71 %"),("Model Aksesibilitas — Random Forest","97.12 %")]:
+        st.markdown(f"<div style='padding:0.5rem 0.7rem;margin-bottom:0.3rem;border-radius:3px;border:1px solid #161616;background:#0c0c0c;'><p style='font-family:DM Mono,monospace;font-size:0.6rem;color:#555;margin:0 0 0.1rem;'>{nm}</p><p style='font-family:DM Mono,monospace;font-size:0.75rem;color:#e8d5a3;margin:0;'>{val}</p></div>", unsafe_allow_html=True)
+
+    st.markdown("<div style='height:1.5rem'></div>", unsafe_allow_html=True)
     st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.55rem;color:#222;letter-spacing:0.12em;line-height:2;border-top:1px solid #1a1a1a;padding-top:1rem;'>DATA · RateYourMusic<br>MODEL · scikit-learn<br>UI · Streamlit</p>", unsafe_allow_html=True)
 
 
-# ══════════════════════════
-# HALAMAN 1 — INTRODUCTION
-# ══════════════════════════
-
-Introduction, Dataset, Analisis, About_Me, Kode_Proyek = st.tabs([
-"Introduction", "Dataset", "Analisis", "About Me", "Kode Proyek"
+# ══════════════════════════════════════════════════════
+# TAB UTAMA — Analisis & Prediksi ditampilkan paling depan
+# ══════════════════════════════════════════════════════
+Analisis, Introduction, Dataset, About_Me, Kode_Proyek = st.tabs([
+    "✦  Analisis & Prediksi", "◎  Pengantar", "▤  Dataset", "◈  Tentang Saya", "⌥  Kode Proyek"
 ])
+
+
+# ══════════════════════════
+# HALAMAN 1 — ANALISIS & PREDIKSI
+# ══════════════════════════
+with Analisis:
+    st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Analisis &amp; Prediksi</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>PILIH ALBUM ATAU ARTIS — SISTEM AKAN MENGANALISIS SELERA MUSIK ANDA</p>", unsafe_allow_html=True)
+
+    # Ambil semua nama album dan artis unik dari dataset
+    ALL_ALBUMS  = sorted(df["release_name"].dropna().unique(), key=str.lower)
+    ALL_ARTISTS = sorted(df["artist_name"].dropna().unique(), key=str.lower)
+
+    # Input pilihan pengguna
+    c1,c2 = st.columns(2)
+    sel_albums  = c1.multiselect("🎵 Album yang Disukai",  ALL_ALBUMS,  placeholder="Ketik atau pilih...")
+    sel_artists = c2.multiselect("🎤 Artis yang Disukai",  ALL_ARTISTS, placeholder="Ketik atau pilih...")
+    n_rek = st.slider("Jumlah Rekomendasi", 3, 10, 5)
+
+    # Tombol analisis
+    _, bc, _ = st.columns([2,1,2])
+    run = bc.button("✦  Analisis Sekarang", type="primary", use_container_width=True)
+
+    if run:
+        if not sel_albums and not sel_artists:
+            st.warning("Silakan pilih minimal satu album atau artis terlebih dahulu.")
+        else:
+            # Cari data album yang sesuai di dataset
+            dfc = get_rows(sel_albums, sel_artists)
+            if dfc.empty:
+                st.error("Data tidak ditemukan. Pastikan nama album atau artis sesuai dengan dataset.")
+            else:
+                # Jalankan prediksi dan rekomendasi
+                era_fav  = get_era(dfc)
+                acc_fav  = get_acc(dfc)
+                top_mood = get_mood(dfc)
+                df_rek   = get_rek(era_fav, acc_fav, top_mood, dfc, n=n_rek)
+                ei, ai   = ERA_INFO.get(era_fav,{}), ACC_INFO.get(acc_fav,{})
+
+                st.markdown(f"<p style='font-size:0.9rem;color:#555;font-style:italic;margin-top:1rem;'>Analisis didasarkan pada {len(dfc)} album yang ditemukan dalam dataset.</p>", unsafe_allow_html=True)
+
+                # ── PREDIKSI ERA & AKSESIBILITAS ──────────────────────
+                # Dua model ML memprediksi era dan tingkat aksesibilitas
+                # selera musik berdasarkan fitur album yang dipilih.
+                divider("Hasil Prediksi — Era dan Aksesibilitas Selera Musik Anda")
+
+                ce,ca = st.columns(2)
+                # Kartu hasil prediksi era musik
+                with ce:
+                    card(f"""
+                    <p style='font-family:DM Mono,monospace;font-size:0.65rem;color:{ei['warna']};letter-spacing:0.2em;margin:0 0 0.6rem;'>MODEL 1 — ERA MUSIK</p>
+                    <div style='font-size:1.8rem;'>{ei['emoji']}</div>
+                    <h2 style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:#f0ede8;margin:0;">{era_fav}</h2>
+                    <p style='font-family:DM Mono,monospace;font-size:0.65rem;color:{ei['warna']};margin:0.3rem 0 0.8rem;'>{ei['rentang']}</p>
+                    <p style='font-size:0.88rem;color:#666;line-height:1.7;margin:0 0 0.4rem;'>{ei['desc']}</p>
+                    <p style='font-size:0.8rem;color:#444;margin:0;'>{ei['tokoh']}</p>
+                    """, warna=ei['warna'], border_left=ei['warna'])
+                # Kartu hasil prediksi aksesibilitas dengan skala visual
+                with ca:
+                    skala = "".join(f"<div style='flex:1;height:5px;background:{ai['warna'] if lv==acc_fav else '#1e1e1e'};border-radius:2px;'></div>" for lv in ACC_ORDER)
+                    card(f"""
+                    <p style='font-family:DM Mono,monospace;font-size:0.65rem;color:{ai['warna']};letter-spacing:0.2em;margin:0 0 0.6rem;'>MODEL 2 — AKSESIBILITAS SELERA</p>
+                    <div style='font-size:1.8rem;'>{ai['emoji']}</div>
+                    <h2 style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:#f0ede8;margin:0;">{acc_fav}</h2>
+                    <p style='font-family:DM Mono,monospace;font-size:0.65rem;color:{ai['warna']};margin:0.3rem 0 0.8rem;'>{ai['singkat']}</p>
+                    <p style='font-size:0.88rem;color:#666;line-height:1.7;margin:0 0 0.8rem;'>{ai['desc']}</p>
+                    <p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#333;margin:0 0 0.4rem;'>NICHE &lt;——&gt; BASIC</p>
+                    <div style='display:flex;gap:0.3rem;'>{skala}</div>
+                    """, warna=ai['warna'], border_left=ai['warna'])
+
+                # ── MOOD DOMINAN ───────────────────────────────────────
+                # Tiga mood paling sering muncul dari deskriptor album
+                # mencerminkan nuansa emosional dominan selera musik Anda.
+                divider("Karakter Mood Musik Anda — Diambil dari Deskriptor Album")
+                # Kolom dibuat sekali di luar loop agar ketiga kartu sejajar
+                mood_cols = st.columns(3)
+                for i,(mood,count) in enumerate(top_mood):
+                    mood_cols[i].markdown(f"<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1.2rem;height:100%;'><p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#e8d5a3;margin:0 0 0.4rem;'>#{i+1}</p><h3 style=\"font-family:'DM Serif Display',serif;font-size:1.3rem;color:#f0ede8;margin:0 0 0.3rem;text-transform:capitalize;\">{mood}</h3><p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#333;margin:0 0 0.6rem;'>muncul {count}x</p><p style='font-size:0.88rem;color:#555;line-height:1.6;margin:0;'>{MOOD_DESC.get(mood,'Deskriptor unik yang jarang ditemukan.')}</p></div>", unsafe_allow_html=True)
+
+                # ── REKOMENDASI ALBUM ──────────────────────────────────
+                # Album direkomendasikan berdasarkan kesamaan era, aksesibilitas,
+                # dan kemiripan mood. Diurutkan dari skor kesesuaian tertinggi.
+                divider(f"Rekomendasi Album — {n_rek} Album Terpilih untuk Anda")
+                for i,(_,r) in enumerate(df_rek.iterrows()):
+                    vibes = " · ".join([k.strip() for k in r.get("descriptors","").split(",") if k.strip() not in EXCLUDE][:4]) if pd.notna(r.get("descriptors")) else ""
+                    url   = r.get("spotify_search_url","")
+                    spot  = f'<a href="{url}" target="_blank" style="display:inline-block;background:#1DB954;color:#000;font-family:DM Mono,monospace;font-size:0.65rem;font-weight:700;padding:0.3rem 0.8rem;border-radius:20px;text-decoration:none;margin-top:0.6rem;">&#9654; Buka di Spotify</a>' if pd.notna(url) and str(url).startswith("http") else ""
+                    st.markdown(f"""<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1rem 1.3rem;margin-bottom:0.5rem;'>
+                        <span style='font-family:DM Mono,monospace;font-size:0.6rem;color:#2a2a2a;'>#{i+1:02d}</span>
+                        <span style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:#f0ede8;margin-left:0.5rem;">{r['release_name']}</span>
+                        <span style='font-size:0.85rem;color:#444;margin-left:0.5rem;'>{r['artist_name']} &middot; {int(r['year'])}</span>
+                        <div style='display:flex;gap:1.5rem;margin-top:0.5rem;font-size:0.82rem;color:#555;'>
+                            <span>&#9733; <b style='color:#e8d5a3;'>{r['avg_rating']:.2f}</b></span>
+                            <span>{r.get('primary_genres','—')}</span>
+                            <span style='color:#444;'>{r['acc_label']}</span>
+                        </div>
+                        {f"<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#2a2a2a;margin:0.4rem 0 0;'>{vibes}</p>" if vibes else ''}
+                        {spot}
+                    </div>""", unsafe_allow_html=True)
+
+                # ── DATA ALBUM PENGGUNA ────────────────────────────────
+                # Daftar album dan artis yang berhasil ditemukan dalam dataset
+                # berdasarkan pilihan pengguna, beserta data lengkapnya.
+                divider(f"Data Album Anda — {len(dfc)} Album Ditemukan dalam Dataset")
+                st.dataframe(dfc[["release_name","artist_name","year","avg_rating","accessibility","era","acc_label","primary_genres"]],
+                    use_container_width=True,
+                    column_config={
+                        "avg_rating":   st.column_config.NumberColumn("Rating", format="%.2f"),
+                        "accessibility":st.column_config.ProgressColumn("Aksesibilitas", min_value=0, max_value=10),
+                    })
+
+
+# ══════════════════════════
+# HALAMAN 2 — PENGANTAR
+# ══════════════════════════
 with Introduction:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:5rem;color:#f0ede8;letter-spacing:-0.03em;line-height:1;margin:0 0 0.5rem;\">REQ<sup style='font-size:0.28em;vertical-align:super;color:#e8d5a3;'>✦</sup></h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#444;letter-spacing:0.2em;margin:0 0 2rem;'>MUSIC MACHINE LEARNING · RECOMMENDATION SYSTEM</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:0.92rem;color:#666;max-width:560px;line-height:1.9;margin-bottom:2rem;'>Masukkan album atau artis favoritmu — REQ akan memprediksi era musikmu, tingkat aksesibilitas selera, top mood, lalu kasih rekomendasi album yang cocok.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.2em;margin:0 0 2rem;'>SISTEM REKOMENDASI MUSIK BERBASIS MACHINE LEARNING</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:1rem;color:#666;max-width:560px;line-height:1.9;margin-bottom:2rem;'>Masukkan album atau artis favorit Anda — REQ akan memprediksi era musik, tingkat aksesibilitas selera, dan mood dominan Anda, lalu memberikan rekomendasi album yang paling sesuai.</p>", unsafe_allow_html=True)
 
-    # Metric ringkas
+    # Metrik ringkas dataset
     c1,c2,c3,c4 = st.columns(4)
-    c1.metric("Total Album",   f"{len(df):,}")
-    c2.metric("Rentang Tahun", f"{int(df['year'].min())}–{int(df['year'].max())}")
-    c3.metric("Avg Rating",    f"{df['avg_rating'].mean():.2f}")
-    c4.metric("Total Artis",   f"{df['artist_name'].nunique():,}")
+    c1.metric("Total Album",      f"{len(df):,}")
+    c2.metric("Rentang Tahun",    f"{int(df['year'].min())}–{int(df['year'].max())}")
+    c3.metric("Rata-rata Rating", f"{df['avg_rating'].mean():.2f}")
+    c4.metric("Total Artis",      f"{df['artist_name'].nunique():,}")
 
     st.markdown("<div style='height:1.5rem'></div>", unsafe_allow_html=True)
 
-    # menghitung dan memproses data era
+    # Visualisasi distribusi era dalam dataset
     label("DISTRIBUSI ERA DALAM DATASET")
-    #mengambil data era dan mengurutkannya dan menugbah nama kolom supaya lebih mudah dibaca
-    ec = df["era"].value_counts().sort_index().reset_index()
-    ec.columns = ["era","count"]
-#membuat chart bar
+    ec = df["era"].value_counts().sort_index().reset_index(); ec.columns = ["era","count"]
     fig = px.bar(ec, x="era", y="count", template="plotly_dark", color="era",
                  color_discrete_map={"Pionir":"#C0A060","Old School":"#E07040","Mid High School":"#5080D0","New School":"#40B080","New New School":"#A050E0"})
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
@@ -175,380 +339,174 @@ with Introduction:
                       yaxis=dict(gridcolor="#1a1a1a",tickfont=dict(color="#444",size=9)))
     st.plotly_chart(fig, use_container_width=True)
 
-    # buat 3 kolom dengan for biar praktis
+    # Tiga langkah cara kerja sistem
     label("CARA KERJA")
     for col, num, judul, isi in zip(st.columns(3),
         ["01","02","03"],
-        ["INPUT","PREDIKSI ML","REKOMENDASI"],
-        ["Pilih album atau artis yang tersedia.",
-         "Dua model memprediksi era dan mood njenengan.",
-         "Rekomendasi album berdasarkan era dan mood."]):
-        col.markdown(f"<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1.3rem;'><p style='font-family:DM Mono,monospace;font-size:0.55rem;color:#2a2a2a;margin:0 0 0.4rem;'>{num}</p><p style=\"font-family:'DM Serif Display',serif;font-size:1rem;color:#e8d5a3;margin:0 0 0.4rem;\">{judul}</p><p style='font-size:0.8rem;color:#555;line-height:1.6;margin:0;'>{isi}</p></div>", unsafe_allow_html=True)
+        ["Input","Prediksi ML","Rekomendasi"],
+        ["Pilih album atau artis yang tersedia dalam dataset.",
+         "Dua model memprediksi era dan aksesibilitas selera musik Anda.",
+         "Album direkomendasikan berdasarkan kecocokan era dan mood."]):
+        col.markdown(f"<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1.3rem;'><p style='font-family:DM Mono,monospace;font-size:0.55rem;color:#2a2a2a;margin:0 0 0.4rem;'>{num}</p><p style=\"font-family:'DM Serif Display',serif;font-size:1rem;color:#e8d5a3;margin:0 0 0.4rem;\">{judul}</p><p style='font-size:0.88rem;color:#555;line-height:1.6;margin:0;'>{isi}</p></div>", unsafe_allow_html=True)
 
 
-
-# HALAMAN 2 — DATASET
-
+# ══════════════════════════
+# HALAMAN 3 — DATASET
+# ══════════════════════════
 with Dataset:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Dataset</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>SOURCE · RATEYOURMUSIC — 5000+ ALBUM</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>SUMBER · RATEYOURMUSIC — 5.000+ ALBUM</p>", unsafe_allow_html=True)
 
-#membuat 4 kolom penjelasan singkat datadset
+    # Metrik ringkas dataset
     m1,m2,m3,m4 = st.columns(4)
-    m1.metric("Total Album",       f"{len(df):,}")
-    m2.metric("Tahun",             f"{int(df['year'].min())}–{int(df['year'].max())}")
-    m3.metric("Avg Rating",        f"{df['avg_rating'].mean():.2f}")
-    m4.metric("Avg Aksesibilitas", f"{df['accessibility'].mean():.1f}/10")
+    m1.metric("Total Album",            f"{len(df):,}")
+    m2.metric("Tahun",                  f"{int(df['year'].min())}–{int(df['year'].max())}")
+    m3.metric("Rata-rata Rating",       f"{df['avg_rating'].mean():.2f}")
+    m4.metric("Rata-rata Aksesibilitas",f"{df['accessibility'].mean():.1f}/10")
 
-    st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
-    #kaya mini navbar
-    tab1, tab2 = st.tabs(["📋  TABEL DATA", "📊  VISUALISASI"])
+    st.markdown("<hr style='border:0;border-top:1px solid #1a1a1a;margin:1.5rem 0 1rem;'>", unsafe_allow_html=True)
 
-    with tab1:
-        # Filter dataset dengan pilihan multiselect
-        f1,f2,f3 = st.columns([2,2,1])
-        era_f = f1.multiselect("Filter Era", df["era"].cat.categories.tolist())
-        acc_f = f2.multiselect("Filter Aksesibilitas", ACC_ORDER)
-        n_r   = f3.number_input("Baris", 10, 500, 50, 10)
+    # ── Tabel data — ditampilkan lebih dahulu karena lebih sering dibutuhkan
+    label("Jelajahi Data — Filter dan Telusuri Album")
+    f1,f2,f3 = st.columns([2,2,1])
+    era_f = f1.multiselect("Filter Era", df["era"].cat.categories.tolist())
+    acc_f = f2.multiselect("Filter Aksesibilitas", ACC_ORDER)
+    n_r   = f3.number_input("Baris", 10, 500, 50, 10)
 
-#mengkopi dataset dan menampilkan
-        df_show = df.copy()
-        if era_f: df_show = df_show[df_show["era"].isin(era_f)]
-        if acc_f: df_show = df_show[df_show["acc_label"].isin(acc_f)]
+    # Terapkan filter ke salinan dataset
+    df_show = df.copy()
+    if era_f: df_show = df_show[df_show["era"].isin(era_f)]
+    if acc_f: df_show = df_show[df_show["acc_label"].isin(acc_f)]
 
+    label(f"{len(df_show):,} baris ditemukan")
+    st.dataframe(df_show[["release_name","artist_name","year","avg_rating","rating_count","accessibility","era","acc_label","primary_genres"]].head(n_r),
+        use_container_width=True, height=420,
+        column_config={
+            "release_name": st.column_config.TextColumn("Album"),
+            "artist_name":  st.column_config.TextColumn("Artis"),
+            "year":         st.column_config.NumberColumn("Tahun", format="%d"),
+            "avg_rating":   st.column_config.NumberColumn("Rating", format="%.2f"),
+            "accessibility":st.column_config.ProgressColumn("Aksesibilitas", min_value=0, max_value=10),
+        })
 
-        label(f"{len(df_show):,} BARIS DITEMUKAN")
-        st.dataframe(df_show[["release_name","artist_name","year","avg_rating","rating_count","accessibility","era","acc_label","primary_genres"]].head(n_r),
-           #meyesuaikan hasil filter, data mana saja yang mau diperlihatkan
-            use_container_width=True, height=420,
-            column_config={
-                "release_name": st.column_config.TextColumn("Album"),
-                "artist_name":  st.column_config.TextColumn("Artis"),
-                "year":         st.column_config.NumberColumn("Tahun", format="%d"),
-                "avg_rating":   st.column_config.NumberColumn("Rating", format="%.2f"),
-                "accessibility":st.column_config.ProgressColumn("Aksesibilitas", min_value=0, max_value=10),
-            })
+    st.markdown("<hr style='border:0;border-top:1px solid #1a1a1a;margin:1.5rem 0 1rem;'>", unsafe_allow_html=True)
 
-    with tab2:
-        #visualisasi data menggunakan barchart dan scatter
-        cl, cr = st.columns(2)
-        #bagian kiri
-        with cl:
-            label("TOP 10 ARTIS — TOTAL RATING")
-            #tambahkan total rating tiap artis dan buat 10 terbesar
-            top_a = df.groupby("artist_name")["rating_count"].sum().nlargest(10).reset_index()
-            st.plotly_chart(bar_dark(top_a,"rating_count","artist_name"), use_container_width=True)
-#scatter
-            label("RATING COUNT VS AVG RATING")
-            fig2 = px.scatter(df, x="log_rating_count", y="avg_rating", color="era", opacity=0.45,
-                              template="plotly_dark", hover_data=["release_name","artist_name"],
-                              color_discrete_map={"Pionir":"#C0A060","Old School":"#E07040","Mid High School":"#5080D0","New School":"#40B080","New New School":"#A050E0"})
-            fig2.update_traces(marker_size=3)
-            fig2.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                               height=260, margin=dict(l=0,r=0,t=6,b=0), showlegend=False,
-                               xaxis=dict(gridcolor="#1e1e1e",tickfont=dict(color="#555",size=9)),
-                               yaxis=dict(gridcolor="#1e1e1e",tickfont=dict(color="#555",size=9)))
-            st.plotly_chart(fig2, use_container_width=True)
+    # ── Visualisasi distribusi dan perbandingan data
+    label("Visualisasi Dataset")
+    cl, cr = st.columns(2)
+    with cl:
+        label("TOP 10 ARTIS — TOTAL RATING")
+        top_a = df.groupby("artist_name")["rating_count"].sum().nlargest(10).reset_index()
+        st.plotly_chart(bar_dark(top_a,"rating_count","artist_name"), use_container_width=True)
 
-#baguan kanan
-        with cr:
-            label("TOP GENRES")
-            semua_genre = [x.strip() for g in df["primary_genres"].dropna() for x in g.split(",")]
-            gdf = pd.DataFrame(Counter(semua_genre).most_common(12), columns=["genre","count"])
-            st.plotly_chart(bar_dark(gdf,"count","genre"), use_container_width=True)
+        label("JUMLAH RATING vs RATA-RATA RATING")
+        fig2 = px.scatter(df, x="log_rating_count", y="avg_rating", color="era", opacity=0.45,
+                          template="plotly_dark", hover_data=["release_name","artist_name"],
+                          color_discrete_map={"Pionir":"#C0A060","Old School":"#E07040","Mid High School":"#5080D0","New School":"#40B080","New New School":"#A050E0"})
+        fig2.update_traces(marker_size=3)
+        fig2.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                           height=260, margin=dict(l=0,r=0,t=6,b=0), showlegend=False,
+                           xaxis=dict(gridcolor="#1e1e1e",tickfont=dict(color="#555",size=9)),
+                           yaxis=dict(gridcolor="#1e1e1e",tickfont=dict(color="#555",size=9)))
+        st.plotly_chart(fig2, use_container_width=True)
 
-            label("TOP 10 ALBUM — AVG RATING")
-            top10 = df.nlargest(10,"avg_rating")[["release_name","avg_rating"]].copy()
-            top10["release_name"] = top10["release_name"].str[:24]
-            st.plotly_chart(bar_dark(top10,"avg_rating","release_name"), use_container_width=True)
+    with cr:
+        label("TOP GENRE")
+        semua_genre = [x.strip() for g in df["primary_genres"].dropna() for x in g.split(",")]
+        gdf = pd.DataFrame(Counter(semua_genre).most_common(12), columns=["genre","count"])
+        st.plotly_chart(bar_dark(gdf,"count","genre"), use_container_width=True)
 
-
-# HALAMAN 3 — ANALISIS
-
-with Analisis:
-    st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Analisis & Rekomendasi</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>PILIH ALBUM ATAU ARTIS DAN AKAN SAYA RAMAL</p>", unsafe_allow_html=True)
-
-#ambil semua data album dan artis tanpa duplikat dan data kososng
-    ALL_ALBUMS  = sorted(df["release_name"].dropna().unique(), key=str.lower)
-    ALL_ARTISTS = sorted(df["artist_name"].dropna().unique(), key=str.lower)
-#pilih album dan artis
-    c1,c2 = st.columns(2)
-    sel_albums  = c1.multiselect("🎵 Album yang disukai",  ALL_ALBUMS,  placeholder="Ketik atau pilih...")
-    sel_artists = c2.multiselect("🎤 Artis yang disukai",    ALL_ARTISTS, placeholder="Ketik atau pilih...")
-    n_rek = st.slider("Jumlah rekomendasi", 3, 10, 5)
-#button generate
-    _, bc, _ = st.columns([2,1,2])
-    run = bc.button("✦  Generate", type="primary", use_container_width=True)
-
-#logika buat generate menggunakan if else beranak
-    if run:
-        if not sel_albums and not sel_artists:
-            st.warning("Pilih minial satu bang.")
-        else:
-#jika data valid nanti dicari era favoritnya, top mood dll jika tidak error
-            dfc = get_rows(sel_albums, sel_artists)
-            if dfc.empty:
-                st.error("tidak berketemu.")
-            else:
-                era_fav  = get_era(dfc)
-                acc_fav  = get_acc(dfc)
-                top_mood = get_mood(dfc)
-                #berikan rekomendasi berdasarkan data era_fav, top_mood dan acc_fav
-                df_rek   = get_rek(era_fav, acc_fav, top_mood, dfc, n=n_rek)
-                #ambil informasi tambahan
-                ei, ai   = ERA_INFO.get(era_fav,{}), ACC_INFO.get(acc_fav,{})
-#outputnya, jumlah album yang dipilih dan penjelasan aksesibilitas singkat
-                st.markdown(f"<p style='font-size:0.82rem;color:#555;font-style:italic;margin-top:1rem;'>Berdasarkan {len(dfc)} album rika {ai.get('singkat','')}.</p>", unsafe_allow_html=True)
-
-                t1,t2,t3 = st.tabs(["🔍  PREDIKSI","💿  REKOMENDASI","🗂  DATA KAMU"])
-
-                with t1:
-                    ce,ca = st.columns(2)
-                    # Card Era
-                    with ce:
-                        card(f"""
-                        <p style='font-family:DM Mono,monospace;font-size:0.58rem;color:{ei['warna']};letter-spacing:0.2em;margin:0 0 0.6rem;'>MODEL 1 — ERA</p>
-                        <div style='font-size:1.8rem;'>{ei['emoji']}</div>
-                        <h2 style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:#f0ede8;margin:0;">{era_fav}</h2>
-                        <p style='font-family:DM Mono,monospace;font-size:0.65rem;color:{ei['warna']};margin:0.3rem 0 0.8rem;'>{ei['rentang']}</p>
-                        <p style='font-size:0.83rem;color:#666;line-height:1.7;margin:0 0 0.4rem;'>{ei['desc']}</p>
-                        <p style='font-size:0.72rem;color:#444;margin:0;'>{ei['tokoh']}</p>
-                        """, warna=ei['warna'], border_left=ei['warna'])
-                    # Card Aksesibilitas
-                    with ca:
-                        skala = "".join(f"<div style='flex:1;height:5px;background:{ai['warna'] if lv==acc_fav else '#1e1e1e'};border-radius:2px;'></div>" for lv in ACC_ORDER)
-                        card(f"""
-                        <p style='font-family:DM Mono,monospace;font-size:0.58rem;color:{ai['warna']};letter-spacing:0.2em;margin:0 0 0.6rem;'>MODEL 2 — AKSESIBILITAS</p>
-                        <div style='font-size:1.8rem;'>{ai['emoji']}</div>
-                        <h2 style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:#f0ede8;margin:0;">{acc_fav}</h2>
-                        <p style='font-family:DM Mono,monospace;font-size:0.65rem;color:{ai['warna']};margin:0.3rem 0 0.8rem;'>{ai['singkat']}</p>
-                        <p style='font-size:0.83rem;color:#666;line-height:1.7;margin:0 0 0.8rem;'>{ai['desc']}</p>
-                        <p style='font-family:DM Mono,monospace;font-size:0.58rem;color:#333;margin:0 0 0.4rem;'>NICHE &lt;——&gt; BASIC</p>
-                        <div style='display:flex;gap:0.3rem;'>{skala}</div>
-                        """, warna=ai['warna'], border_left=ai['warna'])
-
-                    # Top 3 mood
-                    st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
-                    label("TOP 3 MOOD KAMU")
-                    for i,(mood,count) in enumerate(top_mood):
-                        st.columns(3)[i].markdown(f"<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1.1rem;'><p style='font-family:DM Mono,monospace;font-size:0.58rem;color:#e8d5a3;margin:0;'>#{i+1}</p><h3 style=\"font-family:'DM Serif Display',serif;font-size:1.2rem;color:#f0ede8;margin:0.2rem 0;text-transform:capitalize;\">{mood}</h3><p style='font-family:DM Mono,monospace;font-size:0.58rem;color:#333;margin:0 0 0.4rem;'>muncul {count}x</p><p style='font-size:0.78rem;color:#555;line-height:1.6;margin:0;'>{MOOD_DESC.get(mood,'wah hebat, keren.')}</p></div>", unsafe_allow_html=True)
-
-                with t2:
-                    label(f"{n_rek} REKOMENDASI ALBUM")
-                    for i,(_,r) in enumerate(df_rek.iterrows()):
-                        vibes = " · ".join([k.strip() for k in r.get("descriptors","").split(",") if k.strip() not in EXCLUDE][:4]) if pd.notna(r.get("descriptors")) else ""
-                        url   = r.get("spotify_search_url","")
-                        spot  = f'<a href="{url}" target="_blank" style="display:inline-block;background:#1DB954;color:#000;font-family:DM Mono,monospace;font-size:0.58rem;font-weight:700;padding:0.3rem 0.8rem;border-radius:20px;text-decoration:none;margin-top:0.6rem;">&#9654; SPOTIFY</a>' if pd.notna(url) and str(url).startswith("http") else ""
-                        st.markdown(f"""<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1rem 1.3rem;margin-bottom:0.5rem;'>
-                            <span style='font-family:DM Mono,monospace;font-size:0.55rem;color:#2a2a2a;'>#{i+1:02d}</span>
-                            <span style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:#f0ede8;margin-left:0.5rem;">{r['release_name']}</span>
-                            <span style='font-size:0.78rem;color:#444;margin-left:0.5rem;'>{r['artist_name']} &middot; {int(r['year'])}</span>
-                            <div style='display:flex;gap:1.5rem;margin-top:0.5rem;font-size:0.75rem;color:#555;'>
-                                <span>&#9733; <b style='color:#e8d5a3;'>{r['avg_rating']:.2f}</b></span>
-                                <span>{r.get('primary_genres','—')}</span>
-                                <span style='color:#444;'>{r['acc_label']}</span>
-                            </div>
-                            {f"<p style='font-family:DM Mono,monospace;font-size:0.58rem;color:#2a2a2a;margin:0.4rem 0 0;'>{vibes}</p>" if vibes else ''}
-                            {spot}
-                        </div>""", unsafe_allow_html=True)
-
-                with t3:
-                    label(f"ALBUM/ARTIS YANG DITEMUKAN — {len(dfc)} BARIS")
-                    st.dataframe(dfc[["release_name","artist_name","year","avg_rating","accessibility","era","acc_label","primary_genres"]],
-                        use_container_width=True,
-                        column_config={
-                            "avg_rating":   st.column_config.NumberColumn("Rating", format="%.2f"),
-                            "accessibility":st.column_config.ProgressColumn("Aksesibilitas", min_value=0, max_value=10),
-                        })
+        label("TOP 10 ALBUM — RATA-RATA RATING")
+        top10 = df.nlargest(10,"avg_rating")[["release_name","avg_rating"]].copy()
+        top10["release_name"] = top10["release_name"].str[:24]
+        st.plotly_chart(bar_dark(top10,"avg_rating","release_name"), use_container_width=True)
 
 
 # ══════════════════════════
-# HALAMAN 4 — ABOUT ME
+# HALAMAN 4 — TENTANG SAYA
 # ══════════════════════════
 with About_Me:
-    st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:2rem;\">About Me</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:2rem;\">Tentang Saya</h1>", unsafe_allow_html=True)
 
     cf, ci = st.columns([1,2], gap="large")
     with cf:
         st.markdown("<div style='border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;'><img src='https://f4.bcbits.com/img/a0744100055_16.jpg' style='width:100%;display:block;'></div>", unsafe_allow_html=True)
         st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
-        label("ALAT YANG DIGUNAKAN")
-        badges = " ".join(f"<span style='font-family:DM Mono,monospace;font-size:0.62rem;color:#e8d5a3;background:#1a1a1a;padding:0.25rem 0.6rem;border-radius:2px;border:1px solid #2a2a2a;display:inline-block;margin:0.2rem 0.1rem;'>{t}</span>"
+        label("TEKNOLOGI YANG DIGUNAKAN")
+        badges = " ".join(f"<span style='font-family:DM Mono,monospace;font-size:0.65rem;color:#e8d5a3;background:#1a1a1a;padding:0.25rem 0.6rem;border-radius:2px;border:1px solid #2a2a2a;display:inline-block;margin:0.2rem 0.1rem;'>{t}</span>"
                           for t in ["Python","Streamlit","scikit-learn","pandas","Plotly","joblib","RateYourMusic"])
         st.markdown(f"<div style='line-height:2;'>{badges}</div>", unsafe_allow_html=True)
 
     with ci:
         st.markdown("<h2 style=\"font-family:'DM Serif Display',serif;font-size:2rem;color:#f0ede8;margin:0 0 0.3rem;\">RIGEL AMADEUS VOLKER</h2>", unsafe_allow_html=True)
         st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#444;letter-spacing:0.2em;margin:0 0 2rem;'>SISWA &middot; RPL &middot; SMKN PURBALINGGA</p>", unsafe_allow_html=True)
-        ta, tb = st.tabs(["TENTANG","PROYEK"])
-        with ta:
-            st.markdown("<p style='font-size:0.88rem;color:#666;line-height:1.9;margin-bottom:1.5rem;'>Nama saya Rigel Amadeus Volker, siswa SMKN Purbalingga jurusan RPL kelas 11. Saya menyukai musik dan film — karena itu saya membuat projek machine learning ini.</p>", unsafe_allow_html=True)
-            label("KONTAK")
-            st.markdown("<p style='font-size:0.85rem;color:#555;line-height:2.2;'>&#128231; rigel123@gmail.com<br>&#128025; github.com/rigelgithub<br>&#127925; last.fm/gapunya/gapunya123</p>", unsafe_allow_html=True)
-        with tb:
-            st.markdown("<p style='font-size:0.88rem;color:#666;line-height:1.9;'>REQ adalah sistem rekomendasi album berbasis Machine Learning menggunakan dataset dari RateYourMusic. Model mengklasifikasi era dan aksesibilitas selera musik pengguna, lalu merekomendasikan album berdasarkan mood dan era yang cocok.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:0.95rem;color:#666;line-height:1.9;margin-bottom:1.5rem;'>Nama saya Rigel Amadeus Volker, siswa SMKN Purbalingga jurusan RPL kelas 11. Saya menyukai musik dan film — oleh karena itu saya mengembangkan proyek machine learning ini sebagai bentuk eksplorasi minat tersebut.</p>", unsafe_allow_html=True)
+        label("KONTAK")
+        st.markdown("<p style='font-size:0.9rem;color:#555;line-height:2.4;'>&#128231; rigel123@gmail.com<br>&#128025; github.com/rigelgithub<br>&#127925; last.fm/gapunya/gapunya123</p>", unsafe_allow_html=True)
+        st.markdown("<hr style='border:0;border-top:1px solid #1a1a1a;margin:1.2rem 0;'>", unsafe_allow_html=True)
+        label("TENTANG PROYEK")
+        st.markdown("<p style='font-size:0.95rem;color:#666;line-height:1.9;'>REQ adalah sistem rekomendasi album berbasis Machine Learning menggunakan dataset dari RateYourMusic. Model mengklasifikasikan era dan aksesibilitas selera musik pengguna, lalu merekomendasikan album berdasarkan mood dan era yang paling sesuai.</p>", unsafe_allow_html=True)
 
 
 # ══════════════════════════
 # HALAMAN 5 — KODE PROYEK
+# Membaca proyek_reyal.ipynb langsung via nbformat sehingga
+# output nyata tiap sel (gambar, tabel, teks) ikut ditampilkan.
 # ══════════════════════════
 with Kode_Proyek:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Kode Proyek</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>proyek_reyal.ipynb &mdash; ditampilkan cell per cell</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>proyek_reyal.ipynb — ditampilkan per sel beserta outputnya</p>", unsafe_allow_html=True)
 
-    def cell(n, kode, out=None):
-        # Render cell Jupyter-style: nomor, kode, output opsional
-        st.markdown(f"<p style='font-family:DM Mono,monospace;font-size:0.58rem;color:#2a2a2a;margin:1.2rem 0 0.1rem;'>In [{n}]:</p>", unsafe_allow_html=True)
-        st.code(kode, language="python")
-        if out:
-            st.markdown(f"<p style='font-family:DM Mono,monospace;font-size:0.58rem;color:#2a2a2a;margin:0.1rem 0;'>Out [{n}]:</p>", unsafe_allow_html=True)
-            st.markdown(f"<div style='background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:0.9rem 1.1rem;font-family:DM Mono,monospace;font-size:0.72rem;color:#aaa;line-height:1.8;white-space:pre-wrap;'>{out}</div>", unsafe_allow_html=True)
+    nb_path = os.path.join(os.path.dirname(__file__), "proyek reyal.ipynb")
 
-    def note(teks):
-        # Markdown cell — garis biru kiri
-        st.markdown(f"<div style='border-left:2px solid #1e3a5f;padding:0.5rem 1rem;background:#0a0f18;border-radius:0 4px 4px 0;margin:0.5rem 0;font-size:0.85rem;color:#667;'>{teks}</div>", unsafe_allow_html=True)
+    if not os.path.exists(nb_path):
+        st.warning("File proyek_reyal.ipynb tidak ditemukan. Pastikan file berada satu direktori dengan app.py.")
+    else:
+        with open(nb_path, "r", encoding="utf-8") as f:
+            nb = nbformat.read(f, as_version=4)
 
-    # ── 1. Import ──
-    st.markdown("## 1. Import Library")
-    cell(1, """import pandas as pd          # manipulasi data tabel
-import numpy as np           # operasi matematis
-import matplotlib.pyplot as plt  # visualisasi grafik
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.pipeline import Pipeline
-from sklearn.metrics import accuracy_score, classification_report
-from collections import Counter  # hitung frekuensi item
-import joblib                # simpan dan muat model
-import warnings
-warnings.filterwarnings('ignore')""")
+        for i, cell in enumerate(nb.cells):
+            tipe      = cell.cell_type
+            label_sel = "🟦 Markdown" if tipe == "markdown" else "🟩 Code"
 
-    # ── 2. Load Data ──
-    st.markdown("## 2. Load dan Eksplorasi Dataset")
-    cell(2, "df = pd.read_csv('rym.csv')\ndf.head()",
-         "  release_name                   artist_name        release_date  avg_rating  rating_count\n0 OK Computer                    Radiohead          1997-05-21    4.21        95432\n1 In the Aeroplane Over the Sea  Neutral Milk Hotel 1998-02-10    4.27        42100\n2 To Pimp a Butterfly            Kendrick Lamar     2015-03-15    4.36        88230")
-    cell(3, "df.shape", "(5000, 14)")
-    cell(4, "df.isna().sum()",
-         "release_name          0\nrating_count          0\nreview_count         13\naccessibility         2\ndescriptors          80\nspotify_search_url  150\ndtype: int64")
+            # Header tiap sel: nomor urut dan tipe sel
+            st.markdown(
+                f"""<div style="background:#1e2e22;border-left:3px solid #2fa05a;
+                padding:6px 14px;border-radius:6px;margin-bottom:4px;">
+                <span style="color:#7ab8f5;font-size:0.75rem;font-weight:600;">Sel [{i+1}]</span>
+                <span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">&nbsp;·&nbsp;{label_sel}</span>
+                </div>""",
+                unsafe_allow_html=True
+            )
 
-    # ── 3. Feature Engineering ──
-    st.markdown("## 3. Feature Engineering")
-    cell(5, """# Ambil tahun dari tanggal rilis
-df['year'] = pd.to_datetime(df['release_date']).dt.year
+            if tipe == "markdown":
+                # Sel teks/narasi — render sebagai Markdown biasa
+                st.markdown(cell.source)
 
-# Log transform untuk fitur yang distribusinya miring
-df['log_rating_count'] = np.log1p(df['rating_count'])
-df['log_review_count'] = np.log1p(df['review_count'])
+            elif tipe == "code":
+                # Sel kode — tampilkan kode dengan syntax highlighting
+                st.code(cell.source, language="python")
 
-# Buat label era berdasarkan tahun
-df['era'] = pd.cut(df['year'], bins=[0,1969,1984,1999,2012,2026],
-                   labels=['Pionir','Old School','Mid High School','New School','New New School'])
+                # Iterasi seluruh output yang dihasilkan sel tersebut
+                for output in cell.get("outputs", []):
 
-# Buat label aksesibilitas berdasarkan skor
-df['acc_label'] = pd.cut(df['accessibility'], bins=[0,2,4,6,8,10.1],
-                          labels=['Niche','Elitis','Tidak Basic','Agak Lumayan Basic','Basic'])
+                    # Output teks dari print() atau stderr
+                    if output.output_type == "stream":
+                        teks = html.escape(output.text)
+                        st.markdown(f"""<div style="background:#0f1715;border-radius:6px;padding:10px 14px;font-family:monospace;font-size:0.82rem;color:#a8d5b5;white-space:pre-wrap;margin-top:4px;">{teks}</div>""", unsafe_allow_html=True)
 
-df = df.dropna(subset=['era','acc_label'])
-print(df['era'].value_counts().sort_index())""",
-         "era\nPionir                 312\nOld School             887\nMid High School       1204\nNew School            1543\nNew New School        1031\nName: count, dtype: int64")
+                    elif output.output_type in ("display_data", "execute_result"):
+                        # Output gambar dari matplotlib/plotly
+                        if "image/png" in output.data:
+                            import base64
+                            img_data = output.data["image/png"]
+                            st.markdown(f'<img src="data:image/png;base64,{img_data}" style="max-width:100%;border-radius:8px;margin-top:6px;">', unsafe_allow_html=True)
+                        # Output tabel dari pandas (df.head(), df.describe(), dsb.)
+                        elif "text/html" in output.data:
+                            st.markdown(output.data["text/html"], unsafe_allow_html=True)
+                        # Output teks biasa (print, repr)
+                        elif "text/plain" in output.data:
+                            teks = html.escape(output.data["text/plain"])
+                            st.markdown(f"""<div style="background:#0f1715;border-radius:6px;padding:10px 14px;font-family:monospace;font-size:0.82rem;color:#a8d5b5;white-space:pre-wrap;margin-top:4px;">{teks}</div>""", unsafe_allow_html=True)
 
-    # Chart distribusi era live
-    label("VISUALISASI DISTRIBUSI ERA (LIVE)")
-    ec = df["era"].value_counts().sort_index().reset_index(); ec.columns = ["era","count"]
-    fig = px.bar(ec, x="era", y="count", template="plotly_dark", color="era",
-                 color_discrete_map={"Pionir":"#C0A060","Old School":"#E07040","Mid High School":"#5080D0","New School":"#40B080","New New School":"#A050E0"})
-    fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                      height=200, margin=dict(l=0,r=0,t=6,b=0), showlegend=False,
-                      xaxis=dict(gridcolor="#1a1a1a",tickfont=dict(color="#555",size=9)),
-                      yaxis=dict(gridcolor="#1a1a1a",tickfont=dict(color="#444",size=9)))
-    st.plotly_chart(fig, use_container_width=True)
-
-    # ── 4. Model Era ──
-    st.markdown("## 4. Model 1: Klasifikasi Era")
-    note("Fitur: <code>year, avg_rating, log_rating_count, log_review_count, accessibility</code>")
-    cell(6, """X_era = df[['year','avg_rating','log_rating_count','log_review_count','accessibility']]
-y_era = df['era']
-X_train, X_test, y_train, y_test = train_test_split(X_era, y_era, test_size=0.2, random_state=42)
-
-# Latih 3 model, pilih yang terbaik
-era_models = {
-    'Logistic Regression': Pipeline([('scaler',StandardScaler()),('model',LogisticRegression(max_iter=1000))]),
-    'Random Forest':       Pipeline([('scaler',StandardScaler()),('model',RandomForestClassifier(n_estimators=100))]),
-    'KNN':                 Pipeline([('scaler',StandardScaler()),('model',KNeighborsClassifier(n_neighbors=5))]),
-}
-hasil = {}
-for nama, model in era_models.items():
-    model.fit(X_train, y_train)
-    hasil[nama] = accuracy_score(y_test, model.predict(X_test))
-    print(f"  {nama:25s} -> {hasil[nama]*100:.2f}%")
-
-model_era_gacor = era_models[max(hasil, key=hasil.get)]""",
-         "  Logistic Regression       -> 81.24%\n  Random Forest             -> <span style='color:#e8d5a3;font-weight:600;'>94.71%</span>  &lt;-- terpilih\n  KNN                       -> 88.43%")
-
-    cell(7, """print(classification_report(y_test, model_era_gacor.predict(X_test)))""",
-         "                   precision  recall  f1-score\nPionir                  0.92    0.89      0.90\nOld School              0.95    0.96      0.96\nMid High School         0.94    0.93      0.94\nNew School              0.96    0.97      0.96\nNew New School          0.93    0.94      0.94\n\naccuracy                                0.95")
-
-    cell(8, "joblib.dump(model_era_gacor, 'model_era_gacor.joblib')", "['model_era_gacor.joblib']")
-
-    # ── 5. Model Aksesibilitas ──
-    st.markdown("## 5. Model 2: Klasifikasi Aksesibilitas")
-    note("Fitur: <code>accessibility, avg_rating, log_rating_count, log_review_count</code> — kodenya hampir sama")
-    cell(9, """X_acc = df[['accessibility','avg_rating','log_rating_count','log_review_count']]
-y_acc = df['acc_label']
-X_train, X_test, y_train, y_test = train_test_split(X_acc, y_acc, test_size=0.2, random_state=42)
-
-acc_models = {
-    'Logistic Regression': Pipeline([('scaler',StandardScaler()),('model',LogisticRegression(max_iter=1000))]),
-    'Random Forest':       Pipeline([('scaler',StandardScaler()),('model',RandomForestClassifier(n_estimators=100))]),
-    'KNN':                 Pipeline([('scaler',StandardScaler()),('model',KNeighborsClassifier(n_neighbors=5))]),
-}
-hasil = {}
-for nama, model in acc_models.items():
-    model.fit(X_train, y_train)
-    hasil[nama] = accuracy_score(y_test, model.predict(X_test))
-    print(f"  {nama:25s} -> {hasil[nama]*100:.2f}%")
-
-model_acc_gacor = acc_models[max(hasil, key=hasil.get)]
-joblib.dump(model_acc_gacor, 'model_acc_gacor.joblib')""",
-         "  Logistic Regression       -> 88.90%\n  Random Forest             -> <span style='color:#e8d5a3;font-weight:600;'>97.12%</span>  &lt;-- terpilih\n  KNN                       -> 91.40%")
-
-    # ── 6. Fungsi Pipeline ──
-    st.markdown("## 6. Fungsi-Fungsi Pipeline")
-
-    cell(10, """# Cari baris album/artis yang dipilih user di dataset
-def get_rows(albums, artists, df):
-    mask = df["release_name"].isin(albums) | df["artist_name"].isin(artists)
-    return df[mask].drop_duplicates(subset=["release_name","artist_name"])
-
-# Prediksi era dominan dari kumpulan album
-def get_era(dfc, model):
-    p = model.predict(dfc[["year","avg_rating","log_rating_count","log_review_count","accessibility"]])
-    return Counter(p).most_common(1)[0][0]
-
-# Prediksi aksesibilitas dominan
-def get_acc(dfc, model):
-    p = model.predict(dfc[["accessibility","avg_rating","log_rating_count","log_review_count"]])
-    return Counter(p).most_common(1)[0][0]
-
-# Ambil 3 mood paling sering dari descriptor, skip kata teknis
-EXCLUDE = {"malevocals","femalevocals","conceptalbum","instrumental","mixedvocals"}
-def get_mood(dfc):
-    semua = [k.strip() for d in dfc["descriptors"].dropna() for k in d.split(",") if k.strip() not in EXCLUDE]
-    return Counter(semua).most_common(3) if semua else [("tidak tersedia",0)]
-
-# Rekomendasikan album: era sama, aksesibilitas mirip, mood overlap
-ACC_ORDER = ["Niche","Elitis","Tidak Basic","Agak Lumayan Basic","Basic"]
-def get_rek(era, acc, mood, dfc, df, n=5):
-    sudah = set(dfc["release_name"].str.lower())
-    idx   = ACC_ORDER.index(acc) if acc in ACC_ORDER else 2
-    acc_r = [ACC_ORDER[i] for i in {max(0,idx-1), idx, min(4,idx+1)}]
-    kata  = {m[0] for m in mood}
-    rek   = df[(df["era"]==era) & (df["acc_label"].isin(acc_r)) & (~df["release_name"].str.lower().isin(sudah))].copy()
-    if len(rek) < n:  # fallback: longgarkan ke semua aksesibilitas
-        rek = df[(df["era"]==era) & (~df["release_name"].str.lower().isin(sudah))].copy()
-    # Skor = berapa descriptor yang cocok dengan mood user
-    rek["skor"] = rek["descriptors"].apply(lambda d: 0 if pd.isna(d) else len({k.strip() for k in d.split(",")} & kata))
-    return rek.sort_values(["skor","avg_rating"], ascending=[False,False]).head(n)""")
+            st.markdown("<hr style='border:0.5px solid #1e2e22;margin:12px 0'>", unsafe_allow_html=True)
