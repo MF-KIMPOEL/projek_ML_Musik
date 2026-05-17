@@ -164,7 +164,7 @@ with st.sidebar:
     st.markdown("<hr style='border:0;border-top:1px solid #1a1a1a;margin:0 0 1.2rem;'>", unsafe_allow_html=True)
 
     # Daftar navigasi halaman
-    label("Navigasi")
+    label("Penjelasan Singkat")
     for ikon, judul, ket in [
         ("✦","Analisis & Prediksi","Masukkan album atau artis favorit Anda."),
         ("◎","Pengantar","Gambaran umum cara kerja sistem."),
