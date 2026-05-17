@@ -1,7 +1,7 @@
 streamlit
 pandas
-numpy
+nbformat
 scikit-learn
+numpy
 plotly
-joblib
 nbformat
