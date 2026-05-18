@@ -426,16 +426,15 @@ with Dataset:
 # HALAMAN 4 — TENTANG SAYA
 # ══════════════════════════
 with About_Me:
-    st.markdown("<div style='border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;'><img src='https://raw.githubusercontent.com/MF-KIMPOEL/projek_ML_Musik/main/hafidz.jpeg'  style='width:50%;display:block;'></div>", unsafe_allow_html=True)
+    st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:2rem;\">Tentang Saya</h1>", unsafe_allow_html=True)
     cf, ci = st.columns([1,2], gap="large")
     with cf:
-        st.markdown("<div style='border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;'><img src='https://github.com/MF-KIMPOEL/projek_ML_Musik/blob/main/hafidz.jpeg' style='width:100%;display:block;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;'><img src='https://raw.githubusercontent.com/MF-KIMPOEL/projek_ML_Musik/main/hafidz.jpeg' style='width:100%;display:block;'></div>", unsafe_allow_html=True)
         st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
         label("TEKNOLOGI YANG DIGUNAKAN")
         badges = " ".join(f"<span style='font-family:DM Mono,monospace;font-size:0.65rem;color:#e8d5a3;background:#1a1a1a;padding:0.25rem 0.6rem;border-radius:2px;border:1px solid #2a2a2a;display:inline-block;margin:0.2rem 0.1rem;'>{t}</span>"
                           for t in ["Python","Streamlit","scikit-learn","pandas","Plotly","joblib","RateYourMusic"])
         st.markdown(f"<div style='line-height:2;'>{badges}</div>", unsafe_allow_html=True)
-
     with ci:
         st.markdown("<h2 style=\"font-family:'DM Serif Display',serif;font-size:2rem;color:#f0ede8;margin:0 0 0.3rem;\">RIGEL AMADEUS VOLKER</h2>", unsafe_allow_html=True)
         st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#444;letter-spacing:0.2em;margin:0 0 2rem;'>SISWA &middot; RPL &middot; SMKN PURBALINGGA</p>", unsafe_allow_html=True)
@@ -445,8 +444,6 @@ with About_Me:
         st.markdown("<hr style='border:0;border-top:1px solid #1a1a1a;margin:1.2rem 0;'>", unsafe_allow_html=True)
         label("TENTANG PROYEK")
         st.markdown("<p style='font-size:0.95rem;color:#666;line-height:1.9;'>REQ adalah sistem rekomendasi album berbasis Machine Learning menggunakan dataset dari RateYourMusic. Model mengklasifikasikan era dan aksesibilitas selera musik pengguna, lalu merekomendasikan album berdasarkan mood dan era yang paling sesuai.</p>", unsafe_allow_html=True)
-
-
 # ══════════════════════════
 # HALAMAN 5 — KODE PROYEK
 # Membaca proyek_reyal.ipynb langsung via nbformat sehingga
