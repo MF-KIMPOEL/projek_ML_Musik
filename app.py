@@ -430,7 +430,7 @@ with About_Me:
 
     cf, ci = st.columns([1,2], gap="large")
     with cf:
-        st.markdown("<div style='border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;'><img src='https://f4.bcbits.com/img/a0744100055_16.jpg' style='width:100%;display:block;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;'><img src='hafidz.jpeg' style='width:100%;display:block;'></div>", unsafe_allow_html=True)
         st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
         label("TEKNOLOGI YANG DIGUNAKAN")
         badges = " ".join(f"<span style='font-family:DM Mono,monospace;font-size:0.65rem;color:#e8d5a3;background:#1a1a1a;padding:0.25rem 0.6rem;border-radius:2px;border:1px solid #2a2a2a;display:inline-block;margin:0.2rem 0.1rem;'>{t}</span>"
