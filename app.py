@@ -430,7 +430,7 @@ with About_Me:
 
     cf, ci = st.columns([1,2], gap="large")
     with cf:
-        st.markdown("<div style='border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;'><img src='hafidz.jpeg' style='width:100%;display:block;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;'><https://raw.githubusercontent.com/MF-KIMPOEL/projek_ML_Musik/main/hafidz.jpeg style='width:100%;display:block;'></div>", unsafe_allow_html=True)
         st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
         label("TEKNOLOGI YANG DIGUNAKAN")
         badges = " ".join(f"<span style='font-family:DM Mono,monospace;font-size:0.65rem;color:#e8d5a3;background:#1a1a1a;padding:0.25rem 0.6rem;border-radius:2px;border:1px solid #2a2a2a;display:inline-block;margin:0.2rem 0.1rem;'>{t}</span>"
@@ -455,7 +455,7 @@ with About_Me:
 # ══════════════════════════
 with Kode_Proyek:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Kode Proyek</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>proyek_reyal.ipynb — ditampilkan per sel beserta outputnya</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>proyek reyal.ipynb — ditampilkan per sel beserta outputnya</p>", unsafe_allow_html=True)
 
     nb_path = os.path.join(os.path.dirname(__file__), "proyek reyal.ipynb")
 
