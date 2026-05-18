@@ -426,7 +426,7 @@ with Dataset:
 # HALAMAN 4 — TENTANG SAYA
 # ══════════════════════════
 with About_Me:
-    st.markdown("<div style='border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;'><img src='https://raw.githubusercontent.com/MF-KIMPOEL/projek_ML_Musik/main/hafidz.jpeg' style='width:100%;display:block;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;'><img src='https://raw.githubusercontent.com/MF-KIMPOEL/projek_ML_Musik/main/hafidz.jpeg'  style='width:50%;display:block;'></div>", unsafe_allow_html=True)
     cf, ci = st.columns([1,2], gap="large")
     with cf:
         st.markdown("<div style='border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;'><img src='https://github.com/MF-KIMPOEL/projek_ML_Musik/blob/main/hafidz.jpeg' style='width:100%;display:block;'></div>", unsafe_allow_html=True)
