@@ -451,7 +451,7 @@ with About_Me:
 # ══════════════════════════
 with Kode_Proyek:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Kode Proyek</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>proyek reyal.ipynb — ditampilkan per sel beserta outputnya</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>proyek reyal.ipynb — Kode Model ML</p>", unsafe_allow_html=True)
 
     nb_path = os.path.join(os.path.dirname(__file__), "proyek reyal.ipynb")
 
