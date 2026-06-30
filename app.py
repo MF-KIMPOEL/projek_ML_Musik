@@ -196,8 +196,8 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════
 # TAB UTAMA — Analisis & Prediksi ditampilkan paling depan
 # ══════════════════════════════════════════════════════
-Analisis, Introduction, Dataset, About_Me, Kode_Proyek = st.tabs([
-    "✦  Analisis & Prediksi", "◎  Pengantar", "▤  Dataset", "◈  Tentang Saya", "⌥  Kode Proyek"
+Analisis, Introduction, Dataset, Kode_Proyek, About_Me = st.tabs([
+    "✦  Analisis & Prediksi", "◎  Pengantar", "▤  Dataset", "⌥  Kode Proyek", "◈  Tentang Saya"
 ])
 
 
