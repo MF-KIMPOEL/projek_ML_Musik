@@ -17,7 +17,7 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400&display=swap');
 html, body, [class*="css"]  { font-family:'DM Sans',sans-serif; font-size:16px; }
-[data-testid="stSidebar"]   { background:#0a0a0a !important; border-right:1px solid #1a1a1a !important; }
+[data-testid="stSidebar"]   { background:#0a0a0a !important; border-right:1px solid #1a1a1a; }
 [data-testid="stAppViewContainer"] { background:#080808; }
 [data-testid="stHeader"]    { background:transparent; }
 
