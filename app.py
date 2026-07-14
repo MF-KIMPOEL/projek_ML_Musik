@@ -46,7 +46,7 @@ p, li, .stMarkdown p { font-size:1rem !important; line-height:1.85; }
 /* ===== Brighten dark gray text ===== */
 
 /* #222 */
-*[style*="color:#222"]{
+*[style*="color:#777"]{
     color:#888 !important;
 }
 
