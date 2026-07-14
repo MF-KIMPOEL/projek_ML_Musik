@@ -26,7 +26,7 @@ html, body, [class*="css"]  { font-family:'DM Sans',sans-serif; font-size:16px; 
 
 /* Kartu metrik */
 [data-testid="stMetric"]    { background:#0f0f0f; border:1px solid #1e1e1e; border-radius:6px; padding:1.1rem 1.3rem; }
-[data-testid="stMetricLabel"] { font-family:'DM Mono',monospace !important; font-size:0.7rem !important; letter-spacing:0.18em !important; color:#444 !important; }
+[data-testid="stMetricLabel"] { font-family:'DM Mono',monospace !important; font-size:0.7rem !important; letter-spacing:0.18em !important; color:#999 !important; }
 [data-testid="stMetricValue"] { font-family:'DM Serif Display',serif !important; color:#e8d5a3 !important; font-size:1.9rem !important; }
 
 /* Tombol utama */
@@ -37,7 +37,7 @@ html, body, [class*="css"]  { font-family:'DM Sans',sans-serif; font-size:16px; 
 
 /* Tab navigasi */
 .stTabs [data-baseweb="tab-list"] { border-bottom:1px solid #1a1a1a !important; gap:0.2rem; }
-.stTabs [data-baseweb="tab"]       { font-family:'DM Mono',monospace !important; font-size:0.72rem !important; color:#3a3a3a !important; padding:0.6rem 1rem !important; letter-spacing:0.08em; }
+.stTabs [data-baseweb="tab"]       { font-family:'DM Mono',monospace !important; font-size:0.72rem !important; color:#999 !important; padding:0.6rem 1rem !important; letter-spacing:0.08em; }
 .stTabs [aria-selected="true"]     { color:#e8d5a3 !important; border-bottom-color:#e8d5a3 !important; }
 
 /* Input & slider */
@@ -99,7 +99,7 @@ EXCLUDE   = {"malevocals","femalevocals","conceptalbum","instrumental","mixedvoc
 # === FUNGSI HELPER UI ===
 def label(text):
     # Label kecil gaya DM Mono — dipakai sebagai sub-judul bagian
-    st.markdown(f"<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#555;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;'>{text}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#aaa;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0.5rem;'>{text}</p>", unsafe_allow_html=True)
 
 def card(content, warna="#1e1e1e", border_left=None):
     # Kartu gelap dengan aksen warna opsional di sisi kiri
@@ -113,13 +113,13 @@ def bar_dark(data, x, y, h=280):
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                       showlegend=False, coloraxis_showscale=False, height=h,
                       margin=dict(l=0,r=0,t=6,b=0),
-                      xaxis=dict(gridcolor="#1e1e1e", tickfont=dict(color="#555",size=10)),
-                      yaxis=dict(tickfont=dict(color="#aaa",size=10), categoryorder="total ascending"))
+                      xaxis=dict(gridcolor="#1e1e1e", tickfont=dict(color="#aaa",size=10)),
+                      yaxis=dict(tickfont=dict(color="#ddd",size=10), categoryorder="total ascending"))
     return fig
 
 def divider(title):
     # Pemisah antar-segmen — garis tipis + judul bagian di bawahnya
-    st.markdown(f"<div style='margin:2.5rem 0 1.3rem;padding-top:1.8rem;border-top:1px solid #161616;'><p style='font-family:DM Mono,monospace;font-size:0.68rem;color:#444;letter-spacing:0.22em;text-transform:uppercase;margin:0;'>{title}</p></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='margin:2.5rem 0 1.3rem;padding-top:1.8rem;border-top:1px solid #161616;'><p style='font-family:DM Mono,monospace;font-size:0.68rem;color:#999;letter-spacing:0.22em;text-transform:uppercase;margin:0;'>{title}</p></div>", unsafe_allow_html=True)
 
 
 # === FUNGSI ML ===
@@ -160,7 +160,7 @@ def get_rek(era, acc, mood, dfc, n=5):
 with st.sidebar:
     # Judul dan branding aplikasi
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:2.4rem;color:#f0ede8;letter-spacing:-0.03em;line-height:1;margin:1rem 0 0.2rem;\">REQ<sup style='font-size:0.3em;vertical-align:super;color:#e8d5a3;'>✦</sup></h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#333;letter-spacing:0.16em;margin:0 0 1.2rem;'>MUSIC MACHINE LEARNING</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#888;letter-spacing:0.16em;margin:0 0 1.2rem;'>MUSIC MACHINE LEARNING</p>", unsafe_allow_html=True)
     st.markdown("<hr style='border:0;border-top:1px solid #1a1a1a;margin:0 0 1.2rem;'>", unsafe_allow_html=True)
 
     # Daftar navigasi halaman
@@ -172,7 +172,7 @@ with st.sidebar:
         ("◈","Tentang Saya","Profil pengembang aplikasi."),
         ("⌥","Kode Proyek","Notebook pelatihan model secara lengkap."),
     ]:
-        st.markdown(f"<div style='padding:0.6rem 0.8rem;margin-bottom:0.3rem;border-radius:3px;border:1px solid #161616;background:#0c0c0c;'><p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#e8d5a3;margin:0 0 0.15rem;'>{ikon} {judul}</p><p style='font-size:0.82rem;color:#444;margin:0;'>{ket}</p></div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='padding:0.6rem 0.8rem;margin-bottom:0.3rem;border-radius:3px;border:1px solid #161616;background:#0c0c0c;'><p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#e8d5a3;margin:0 0 0.15rem;'>{ikon} {judul}</p><p style='font-size:0.82rem;color:#999;margin:0;'>{ket}</p></div>", unsafe_allow_html=True)
 
     st.markdown("<hr style='border:0;border-top:1px solid #1a1a1a;margin:1rem 0;'>", unsafe_allow_html=True)
 
@@ -180,17 +180,17 @@ with st.sidebar:
     label("Statistik Dataset")
     for nama, nilai in [("Total Album",f"{len(df):,}"),("Total Artis",f"{df['artist_name'].nunique():,}"),
                         ("Rentang Tahun",f"{int(df['year'].min())}–{int(df['year'].max())}"),("Rata-rata Rating",f"{df['avg_rating'].mean():.2f}")]:
-        st.markdown(f"<div style='display:flex;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid #111;'><span style='font-size:0.82rem;color:#444;'>{nama}</span><span style='font-family:DM Mono,monospace;font-size:0.82rem;color:#e8d5a3;'>{nilai}</span></div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='display:flex;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid #111;'><span style='font-size:0.82rem;color:#999;'>{nama}</span><span style='font-family:DM Mono,monospace;font-size:0.82rem;color:#e8d5a3;'>{nilai}</span></div>", unsafe_allow_html=True)
 
     st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
 
     # Informasi akurasi model
     label("Akurasi Model")
     for nm, val in [("Model Era — Random Forest","94.71 %"),("Model Aksesibilitas — Random Forest","97.12 %")]:
-        st.markdown(f"<div style='padding:0.5rem 0.7rem;margin-bottom:0.3rem;border-radius:3px;border:1px solid #161616;background:#0c0c0c;'><p style='font-family:DM Mono,monospace;font-size:0.6rem;color:#555;margin:0 0 0.1rem;'>{nm}</p><p style='font-family:DM Mono,monospace;font-size:0.75rem;color:#e8d5a3;margin:0;'>{val}</p></div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='padding:0.5rem 0.7rem;margin-bottom:0.3rem;border-radius:3px;border:1px solid #161616;background:#0c0c0c;'><p style='font-family:DM Mono,monospace;font-size:0.6rem;color:#aaa;margin:0 0 0.1rem;'>{nm}</p><p style='font-family:DM Mono,monospace;font-size:0.75rem;color:#e8d5a3;margin:0;'>{val}</p></div>", unsafe_allow_html=True)
 
     st.markdown("<div style='height:1.5rem'></div>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.55rem;color:#222;letter-spacing:0.12em;line-height:2;border-top:1px solid #1a1a1a;padding-top:1rem;'>DATA · RateYourMusic<br>MODEL · scikit-learn<br>UI · Streamlit</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.55rem;color:#777;letter-spacing:0.12em;line-height:2;border-top:1px solid #1a1a1a;padding-top:1rem;'>DATA · RateYourMusic<br>MODEL · scikit-learn<br>UI · Streamlit</p>", unsafe_allow_html=True)
 
 
 # ══════════════════════════════════════════════════════
@@ -206,7 +206,7 @@ Analisis, Introduction, Dataset, Kode_Proyek, About_Me = st.tabs([
 # ══════════════════════════
 with Analisis:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Analisis &amp; Prediksi</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>PILIH ALBUM ATAU ARTIS — SISTEM AKAN MENGANALISIS SELERA MUSIK ANDA</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#999;letter-spacing:0.15em;margin-bottom:2rem;'>PILIH ALBUM ATAU ARTIS — SISTEM AKAN MENGANALISIS SELERA MUSIK ANDA</p>", unsafe_allow_html=True)
 
     # Ambil semua nama album dan artis unik dari dataset
     ALL_ALBUMS  = sorted(df["release_name"].dropna().unique(), key=str.lower)
@@ -238,7 +238,7 @@ with Analisis:
                 df_rek   = get_rek(era_fav, acc_fav, top_mood, dfc, n=n_rek)
                 ei, ai   = ERA_INFO.get(era_fav,{}), ACC_INFO.get(acc_fav,{})
 
-                st.markdown(f"<p style='font-size:0.9rem;color:#555;font-style:italic;margin-top:1rem;'>Analisis didasarkan pada {len(dfc)} album yang ditemukan dalam dataset.</p>", unsafe_allow_html=True)
+                st.markdown(f"<p style='font-size:0.9rem;color:#aaa;font-style:italic;margin-top:1rem;'>Analisis didasarkan pada {len(dfc)} album yang ditemukan dalam dataset.</p>", unsafe_allow_html=True)
 
                 # ── PREDIKSI ERA & AKSESIBILITAS ──────────────────────
                 # Dua model ML memprediksi era dan tingkat aksesibilitas
@@ -253,8 +253,8 @@ with Analisis:
                     <div style='font-size:1.8rem;'>{ei['emoji']}</div>
                     <h2 style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:#f0ede8;margin:0;">{era_fav}</h2>
                     <p style='font-family:DM Mono,monospace;font-size:0.65rem;color:{ei['warna']};margin:0.3rem 0 0.8rem;'>{ei['rentang']}</p>
-                    <p style='font-size:0.88rem;color:#666;line-height:1.7;margin:0 0 0.4rem;'>{ei['desc']}</p>
-                    <p style='font-size:0.8rem;color:#444;margin:0;'>{ei['tokoh']}</p>
+                    <p style='font-size:0.88rem;color:#bbb;line-height:1.7;margin:0 0 0.4rem;'>{ei['desc']}</p>
+                    <p style='font-size:0.8rem;color:#999;margin:0;'>{ei['tokoh']}</p>
                     """, warna=ei['warna'], border_left=ei['warna'])
                 # Kartu hasil prediksi aksesibilitas dengan skala visual
                 with ca:
@@ -264,8 +264,8 @@ with Analisis:
                     <div style='font-size:1.8rem;'>{ai['emoji']}</div>
                     <h2 style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:#f0ede8;margin:0;">{acc_fav}</h2>
                     <p style='font-family:DM Mono,monospace;font-size:0.65rem;color:{ai['warna']};margin:0.3rem 0 0.8rem;'>{ai['singkat']}</p>
-                    <p style='font-size:0.88rem;color:#666;line-height:1.7;margin:0 0 0.8rem;'>{ai['desc']}</p>
-                    <p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#333;margin:0 0 0.4rem;'>NICHE &lt;——&gt; BASIC</p>
+                    <p style='font-size:0.88rem;color:#bbb;line-height:1.7;margin:0 0 0.8rem;'>{ai['desc']}</p>
+                    <p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#888;margin:0 0 0.4rem;'>NICHE &lt;——&gt; BASIC</p>
                     <div style='display:flex;gap:0.3rem;'>{skala}</div>
                     """, warna=ai['warna'], border_left=ai['warna'])
 
@@ -276,7 +276,7 @@ with Analisis:
                 # Kolom dibuat sekali di luar loop agar ketiga kartu sejajar
                 mood_cols = st.columns(3)
                 for i,(mood,count) in enumerate(top_mood):
-                    mood_cols[i].markdown(f"<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1.2rem;height:100%;'><p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#e8d5a3;margin:0 0 0.4rem;'>#{i+1}</p><h3 style=\"font-family:'DM Serif Display',serif;font-size:1.3rem;color:#f0ede8;margin:0 0 0.3rem;text-transform:capitalize;\">{mood}</h3><p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#333;margin:0 0 0.6rem;'>muncul {count}x</p><p style='font-size:0.88rem;color:#555;line-height:1.6;margin:0;'>{MOOD_DESC.get(mood,'Deskriptor unik yang jarang ditemukan.')}</p></div>", unsafe_allow_html=True)
+                    mood_cols[i].markdown(f"<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1.2rem;height:100%;'><p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#e8d5a3;margin:0 0 0.4rem;'>#{i+1}</p><h3 style=\"font-family:'DM Serif Display',serif;font-size:1.3rem;color:#f0ede8;margin:0 0 0.3rem;text-transform:capitalize;\">{mood}</h3><p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#888;margin:0 0 0.6rem;'>muncul {count}x</p><p style='font-size:0.88rem;color:#aaa;line-height:1.6;margin:0;'>{MOOD_DESC.get(mood,'Deskriptor unik yang jarang ditemukan.')}</p></div>", unsafe_allow_html=True)
 
                 # ── REKOMENDASI ALBUM ──────────────────────────────────
                 # Album direkomendasikan berdasarkan kesamaan era, aksesibilitas,
@@ -287,15 +287,15 @@ with Analisis:
                     url   = r.get("spotify_search_url","")
                     spot  = f'<a href="{url}" target="_blank" style="display:inline-block;background:#1DB954;color:#000;font-family:DM Mono,monospace;font-size:0.65rem;font-weight:700;padding:0.3rem 0.8rem;border-radius:20px;text-decoration:none;margin-top:0.6rem;">&#9654; Buka di Spotify</a>' if pd.notna(url) and str(url).startswith("http") else ""
                     st.markdown(f"""<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1rem 1.3rem;margin-bottom:0.5rem;'>
-                        <span style='font-family:DM Mono,monospace;font-size:0.6rem;color:#2a2a2a;'>#{i+1:02d}</span>
+                        <span style='font-family:DM Mono,monospace;font-size:0.6rem;color:#666;'>#{i+1:02d}</span>
                         <span style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:#f0ede8;margin-left:0.5rem;">{r['release_name']}</span>
-                        <span style='font-size:0.85rem;color:#444;margin-left:0.5rem;'>{r['artist_name']} &middot; {int(r['year'])}</span>
-                        <div style='display:flex;gap:1.5rem;margin-top:0.5rem;font-size:0.82rem;color:#555;'>
+                        <span style='font-size:0.85rem;color:#999;margin-left:0.5rem;'>{r['artist_name']} &middot; {int(r['year'])}</span>
+                        <div style='display:flex;gap:1.5rem;margin-top:0.5rem;font-size:0.82rem;color:#aaa;'>
                             <span>&#9733; <b style='color:#e8d5a3;'>{r['avg_rating']:.2f}</b></span>
                             <span>{r.get('primary_genres','—')}</span>
-                            <span style='color:#444;'>{r['acc_label']}</span>
+                            <span style='color:#999;'>{r['acc_label']}</span>
                         </div>
-                        {f"<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#2a2a2a;margin:0.4rem 0 0;'>{vibes}</p>" if vibes else ''}
+                        {f"<p style='font-family:DM Mono,monospace;font-size:0.62rem;color:#666;margin:0.4rem 0 0;'>{vibes}</p>" if vibes else ''}
                         {spot}
                     </div>""", unsafe_allow_html=True)
 
@@ -316,8 +316,8 @@ with Analisis:
 # ══════════════════════════
 with Introduction:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:5rem;color:#f0ede8;letter-spacing:-0.03em;line-height:1;margin:0 0 0.5rem;\">REQ<sup style='font-size:0.28em;vertical-align:super;color:#e8d5a3;'>✦</sup></h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.2em;margin:0 0 2rem;'>SISTEM REKOMENDASI MUSIK BERBASIS MACHINE LEARNING</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:1rem;color:#666;max-width:560px;line-height:1.9;margin-bottom:2rem;'>Masukkan album atau artis favorit Anda — REQ akan memprediksi era musik, tingkat aksesibilitas selera, dan mood dominan Anda, lalu memberikan rekomendasi album yang paling sesuai.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#999;letter-spacing:0.2em;margin:0 0 2rem;'>SISTEM REKOMENDASI MUSIK BERBASIS MACHINE LEARNING</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:1rem;color:#bbb;max-width:560px;line-height:1.9;margin-bottom:2rem;'>Masukkan album atau artis favorit Anda — REQ akan memprediksi era musik, tingkat aksesibilitas selera, dan mood dominan Anda, lalu memberikan rekomendasi album yang paling sesuai.</p>", unsafe_allow_html=True)
 
     # Metrik ringkas dataset
     c1,c2,c3,c4 = st.columns(4)
@@ -335,8 +335,8 @@ with Introduction:
                  color_discrete_map={"Pionir":"#C0A060","Old School":"#E07040","Mid High School":"#5080D0","New School":"#40B080","New New School":"#A050E0"})
     fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                       height=200, margin=dict(l=0,r=0,t=6,b=0), showlegend=False,
-                      xaxis=dict(gridcolor="#1a1a1a",tickfont=dict(color="#555",size=10)),
-                      yaxis=dict(gridcolor="#1a1a1a",tickfont=dict(color="#444",size=9)))
+                      xaxis=dict(gridcolor="#1a1a1a",tickfont=dict(color="#aaa",size=10)),
+                      yaxis=dict(gridcolor="#1a1a1a",tickfont=dict(color:#999,size=9)))
     st.plotly_chart(fig, use_container_width=True)
 
     # Tiga langkah cara kerja sistem
@@ -347,7 +347,7 @@ with Introduction:
         ["Pilih album atau artis yang tersedia dalam dataset.",
          "Dua model memprediksi era dan aksesibilitas selera musik Anda.",
          "Album direkomendasikan berdasarkan kecocokan era dan mood."]):
-        col.markdown(f"<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1.3rem;'><p style='font-family:DM Mono,monospace;font-size:0.55rem;color:#2a2a2a;margin:0 0 0.4rem;'>{num}</p><p style=\"font-family:'DM Serif Display',serif;font-size:1rem;color:#e8d5a3;margin:0 0 0.4rem;\">{judul}</p><p style='font-size:0.88rem;color:#555;line-height:1.6;margin:0;'>{isi}</p></div>", unsafe_allow_html=True)
+        col.markdown(f"<div style='background:#0f0f0f;border:1px solid #1e1e1e;border-radius:4px;padding:1.3rem;'><p style='font-family:DM Mono,monospace;font-size:0.55rem;color:#666;margin:0 0 0.4rem;'>{num}</p><p style=\"font-family:'DM Serif Display',serif;font-size:1rem;color:#e8d5a3;margin:0 0 0.4rem;\">{judul}</p><p style='font-size:0.88rem;color:#aaa;line-height:1.6;margin:0;'>{isi}</p></div>", unsafe_allow_html=True)
 
 
 # ══════════════════════════
@@ -355,7 +355,7 @@ with Introduction:
 # ══════════════════════════
 with Dataset:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Dataset</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>SUMBER · RATEYOURMUSIC — 5.000+ ALBUM</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#999;letter-spacing:0.15em;margin-bottom:2rem;'>SUMBER · RATEYOURMUSIC — 5.000+ ALBUM</p>", unsafe_allow_html=True)
 
     # Metrik ringkas dataset
     m1,m2,m3,m4 = st.columns(4)
@@ -406,8 +406,8 @@ with Dataset:
         fig2.update_traces(marker_size=3)
         fig2.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                            height=260, margin=dict(l=0,r=0,t=6,b=0), showlegend=False,
-                           xaxis=dict(gridcolor="#1e1e1e",tickfont=dict(color="#555",size=9)),
-                           yaxis=dict(gridcolor="#1e1e1e",tickfont=dict(color="#555",size=9)))
+                           xaxis=dict(gridcolor="#1e1e1e",tickfont=dict(color="#aaa",size=9)),
+                           yaxis=dict(gridcolor="#1e1e1e",tickfont=dict(color="#aaa",size=9)))
         st.plotly_chart(fig2, use_container_width=True)
 
     with cr:
@@ -437,13 +437,13 @@ with About_Me:
         st.markdown(f"<div style='line-height:2;'>{badges}</div>", unsafe_allow_html=True)
     with ci:
         st.markdown("<h2 style=\"font-family:'DM Serif Display',serif;font-size:2rem;color:#f0ede8;margin:0 0 0.3rem;\">RIGEL AMADEUS VOLKER</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#444;letter-spacing:0.2em;margin:0 0 2rem;'>SISWA &middot; RPL &middot; SMKN PURBALINGGA</p>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size:0.95rem;color:#666;line-height:1.9;margin-bottom:1.5rem;'>Nama saya Rigel Amadeus Volker, siswa SMKN Purbalingga jurusan RPL kelas 11. Saya menyukai musik dan film — oleh karena itu saya mengembangkan proyek machine learning ini sebagai bentuk eksplorasi minat tersebut.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.65rem;color:#999;letter-spacing:0.2em;margin:0 0 2rem;'>SISWA &middot; RPL &middot; SMKN PURBALINGGA</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:0.95rem;color:#bbb;line-height:1.9;margin-bottom:1.5rem;'>Nama saya Rigel Amadeus Volker, siswa SMKN Purbalingga jurusan RPL kelas 11. Saya menyukai musik dan film — oleh karena itu saya mengembangkan proyek machine learning ini sebagai bentuk eksplorasi minat tersebut.</p>", unsafe_allow_html=True)
         label("KONTAK")
-        st.markdown("<p style='font-size:0.9rem;color:#555;line-height:2.4;'>&#128231; rigel123@gmail.com<br>&#128025; github.com/rigelgithub<br>&#127925; last.fm/gapunya/gapunya123</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:0.9rem;color:#aaa;line-height:2.4;'>&#128231; rigel123@gmail.com<br>&#128025; github.com/rigelgithub<br>&#127925; last.fm/gapunya/gapunya123</p>", unsafe_allow_html=True)
         st.markdown("<hr style='border:0;border-top:1px solid #1a1a1a;margin:1.2rem 0;'>", unsafe_allow_html=True)
         label("TENTANG PROYEK")
-        st.markdown("<p style='font-size:0.95rem;color:#666;line-height:1.9;'>REQ adalah sistem rekomendasi album berbasis Machine Learning menggunakan dataset dari RateYourMusic. Model mengklasifikasikan era dan aksesibilitas selera musik pengguna, lalu merekomendasikan album berdasarkan mood dan era yang paling sesuai.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:0.95rem;color:#bbb;line-height:1.9;'>REQ adalah sistem rekomendasi album berbasis Machine Learning menggunakan dataset dari RateYourMusic. Model mengklasifikasikan era dan aksesibilitas selera musik pengguna, lalu merekomendasikan album berdasarkan mood dan era yang paling sesuai.</p>", unsafe_allow_html=True)
 # ══════════════════════════
 # HALAMAN 5 — KODE PROYEK
 # Membaca proyek_reyal.ipynb langsung via nbformat sehingga
@@ -451,7 +451,7 @@ with About_Me:
 # ══════════════════════════
 with Kode_Proyek:
     st.markdown("<h1 style=\"font-family:'DM Serif Display',serif;font-size:3rem;color:#f0ede8;margin-bottom:0.2rem;\">Kode Proyek</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#444;letter-spacing:0.15em;margin-bottom:2rem;'>proyek reyal.ipynb — Kode Model ML</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-family:DM Mono,monospace;font-size:0.7rem;color:#999;letter-spacing:0.15em;margin-bottom:2rem;'>proyek reyal.ipynb — Kode Model ML</p>", unsafe_allow_html=True)
 
     nb_path = os.path.join(os.path.dirname(__file__), "proyek reyal.ipynb")
 
@@ -470,7 +470,7 @@ with Kode_Proyek:
                 f"""<div style="background:#1e2e22;border-left:3px solid #2fa05a;
                 padding:6px 14px;border-radius:6px;margin-bottom:4px;">
                 <span style="color:#7ab8f5;font-size:0.75rem;font-weight:600;">Sel [{i+1}]</span>
-                <span style="color:rgba(255,255,255,0.4);font-size:0.75rem;">&nbsp;·&nbsp;{label_sel}</span>
+                <span style="color:rgba(255,255,255,0.7);font-size:0.75rem;">&nbsp;·&nbsp;{label_sel}</span>
                 </div>""",
                 unsafe_allow_html=True
             )
