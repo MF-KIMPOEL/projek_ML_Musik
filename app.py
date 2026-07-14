@@ -38,7 +38,7 @@ html, body, [class*="css"]  { font-family:'DM Sans',sans-serif; font-size:16px; 
 /* Tab navigasi */
 .stTabs [data-baseweb="tab-list"] { border-bottom:1px solid #1a1a1a !important; gap:0.2rem; }
 .stTabs [data-baseweb="tab"]       { font-family:'DM Mono',monospace !important; font-size:0.72rem !important; color:#8a8a8a !important; padding:0.6rem 1rem !important; letter-spacing:0.08em; }
-.stTabs [aria-selected="true"]     { color:#e8d5a3 !important; border-bottom-color:#e8d5a3 !important; }
+.stTabs [aria-selected="true"]     { color:#e8d5a3 !important; border-bottom-color:#e8d5a3; }
 
 /* Input & slider */
 [data-testid="stSlider"] { padding:0.3rem 0 0.8rem; }
