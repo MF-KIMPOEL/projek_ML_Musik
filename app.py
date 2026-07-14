@@ -43,6 +43,37 @@ html, body, [class*="css"]  { font-family:'DM Sans',sans-serif; font-size:16px; 
 /* Input & slider */
 [data-testid="stSlider"] { padding:0.3rem 0 0.8rem; }
 p, li, .stMarkdown p { font-size:1rem !important; line-height:1.85; }
+/* ===== Brighten dark gray text ===== */
+
+/* #222 */
+*[style*="color:#222"]{
+    color:#888 !important;
+}
+
+/* #2a2a2a */
+*[style*="color:#2a2a2a"]{
+    color:#999 !important;
+}
+
+/* #333 */
+*[style*="color:#333"]{
+    color:#a8a8a8 !important;
+}
+
+/* #444 */
+*[style*="color:#444"]{
+    color:#b8b8b8 !important;
+}
+
+/* #555 */
+*[style*="color:#555"]{
+    color:#c8c8c8 !important;
+}
+
+/* #666 */
+*[style*="color:#666"]{
+    color:#d8d8d8 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
